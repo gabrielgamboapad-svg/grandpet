@@ -212,8 +212,20 @@ def main():
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text("// Generado por tools/build_data.py — no editar a mano.\nwindow.PRODUCTS = "
                    + json.dumps(out, ensure_ascii=False) + ";\n", encoding="utf-8")
+    # Políticas de la tienda, sanitizadas, para mostrarlas dentro del sitio (politicas.html).
+    pols = []
+    for slug, key in (("shipping-policy", "envios"), ("refund-policy", "devoluciones"),
+                      ("privacy-policy", "privacidad"), ("terms-of-service", "terminos")):
+        pol = get(f"/policies/{slug}.json")["policy"]
+        b = Blocks()
+        b.feed(pol["body"])
+        b.flush()
+        pols.append({"key": key, "title": pol["title"], "html": "\n".join(b.blocks)})
+    (OUT.parent / "policies.js").write_text("// Generado por tools/build_data.py — no editar a mano.\nwindow.POLICIES = "
+                                            + json.dumps(pols, ensure_ascii=False) + ";\n", encoding="utf-8")
+
     from collections import Counter
-    print(len(out), "productos ->", OUT)
+    print(len(out), "productos ->", OUT, "|", len(pols), "políticas")
     for k in ("pet", "stage", "format", "brand"):
         print(k, dict(Counter(x[k] for x in out)))
 

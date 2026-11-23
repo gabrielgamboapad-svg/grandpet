@@ -1,10 +1,7 @@
 // Ajustes del sitio. Este es el ÚNICO lugar donde se cambian teléfono, envío y promociones.
 window.GP_CONFIG = {
-  // Tienda Shopify: checkout, cuentas de cliente y políticas viven ahí.
-  store: "https://grandpet2u.com",
-
-  // Teléfono principal, 10 dígitos sin espacios (ej. 4771234567). Se usa en header, footer,
-  // ficha de producto, carrito, enlaces tel: y WhatsApp (wa.me/52...).
+  // Teléfono principal, 10 dígitos sin espacios (ej. 4771234567). Se usa en footer, ficha de producto,
+  // carrito, enlaces tel: y WhatsApp (wa.me/52...). Los pedidos del carrito llegan a este WhatsApp.
   phone: "PHONE_PRINCIPAL",
 
   // Envío gratis desde este monto (MXN), sujeto a cobertura.

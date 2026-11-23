@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Políticas | GrandPET®</title>
+  <meta name="description" content="Política de envíos, cambios y devoluciones, aviso de privacidad y términos de GrandPET.">
+  <meta name="theme-color" content="#FFF8EF">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+  <div id="site-header"></div>
+  <main id="main" class="wrap">
+    <h1 style="margin-top:20px">Políticas</h1>
+    <nav aria-label="Políticas" class="chips" style="padding:0 0 16px"></nav>
+    <div id="policies"></div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="data/products.js" defer></script>
+  <script src="data/policies.js" defer></script>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+  <script>
+    // Los scripts con defer ya corrieron al llegar DOMContentLoaded.
+    addEventListener("DOMContentLoaded", () => {
+      const { esc } = window.GP;
+      // p.html viene sanitizado por tools/build_data.py
+      document.querySelector("nav.chips").innerHTML = POLICIES.map((p) => `<a class="chip" href="#${p.key}">${esc(p.title)}</a>`).join("");
+      document.getElementById("policies").innerHTML = POLICIES.map((p) => `<section class="policy" id="${p.key}"><h2>${esc(p.title)}</h2>${p.html}</section>`).join("");
+      if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
+    });
+  </script>
+</body>
+</html>

@@ -18,7 +18,7 @@
 
   const multi = p.variants.length > 1;
   let v = p.variants.find((x) => String(x.id) === params.get("v")) || p.variants.find((x) => x.available) || p.variants[0];
-  // Las miniaturas usan el alt de Shopify como etiqueta (p. ej. "Beneficios", "Ingredientes"); si no hay, uno genérico.
+  // Las miniaturas usan el alt de la imagen como etiqueta (p. ej. "Beneficios", "Ingredientes"); si no hay, uno genérico.
   const label = (im, i) => im.alt || (i === 0 ? "Empaque" : `Vista ${i + 1}`);
   const altFor = (im, i) => im.alt || (i === 0 ? `Empaque de ${p.title}` : `${p.title}, vista ${i + 1}`);
   const meta = p.variants.length === 1 && p.variants[0].title !== "Default Title" ? p.variants[0].title : "";
@@ -56,7 +56,7 @@
         <ul class="ship-signals">
           <li>${ICON.truck}Envíos nacionales</li>
           <li>${ICON.gift}Envío gratis desde ${money(CFG.freeShipping)} MXN, sujeto a cobertura</li>
-          <li>${ICON.shield}Pago seguro en el checkout de Shopify, también como invitado</li>
+          <li>${ICON.shield}Sin registro: confirmas tu pedido por WhatsApp</li>
         </ul>
       </div>
     </div>
@@ -67,12 +67,12 @@
       <div class="accordion"><details><summary>Opiniones de clientes</summary><div class="acc-body"><p>Aún no hay reseñas de este producto.</p></div></details></div>
       <h2>Preguntas frecuentes</h2>
       <div class="accordion">
-        <details><summary>¿Hacen envíos a todo México?</summary><div class="acc-body"><p>Hacemos envíos nacionales. El envío es gratis desde ${money(CFG.freeShipping)} MXN, sujeto a cobertura. Consulta la <a href="${CFG.store}/policies/shipping-policy">política de envíos</a>.</p></div></details>
-        <details><summary>¿Necesito crear una cuenta para comprar?</summary><div class="acc-body"><p>No. Puedes comprar como invitado. Si <a href="${CFG.store}/account/login">inicias sesión</a>, compras más rápido y ves tus pedidos.</p></div></details>
+        <details><summary>¿Hacen envíos a todo México?</summary><div class="acc-body"><p>Hacemos envíos nacionales. El envío es gratis desde ${money(CFG.freeShipping)} MXN, sujeto a cobertura. Consulta la <a href="politicas.html#envios">política de envíos</a>.</p></div></details>
+        <details><summary>¿Cómo hago mi pedido?</summary><div class="acc-body"><p>Agrega tus productos al carrito, llena tus datos de entrega y envía el pedido por WhatsApp. Te confirmamos disponibilidad, costo de envío y forma de pago. No necesitas crear una cuenta.</p></div></details>
         <details><summary>¿Tienes dudas sobre qué alimento elegir?</summary><div class="acc-body"><p>Escríbenos por <a href="${wa("Hola, tengo una duda sobre " + p.title)}">WhatsApp</a> y te ayudamos a elegir según la edad y tamaño de tu mascota.</p></div></details>
       </div>
       <h2>Cambios y devoluciones</h2>
-      <div class="accordion"><details><summary>Política de devoluciones</summary><div class="acc-body"><p>Revisa las condiciones en nuestra <a href="${CFG.store}/policies/refund-policy">política de cambios y devoluciones</a>.</p></div></details></div>
+      <div class="accordion"><details><summary>Política de devoluciones</summary><div class="acc-body"><p>Revisa las condiciones en nuestra <a href="politicas.html#devoluciones">política de cambios y devoluciones</a>.</p></div></details></div>
     </div>
   </article>`;
 
@@ -113,7 +113,7 @@
     "@context": "https://schema.org", "@type": "Product", name: p.title, brand: { "@type": "Brand", name: p.brand },
     image: p.images.map((i) => i.src), description: desc,
     offers: p.variants.map((x) => ({ "@type": "Offer", name: x.title, price: x.price.toFixed(2), priceCurrency: "MXN", sku: String(x.id),
-      availability: x.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock", url: `${CFG.store}/products/${p.handle}?variant=${x.id}` })),
+      availability: x.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock", url: `${location.origin}${location.pathname}?p=${encodeURIComponent(p.handle)}&v=${x.id}` })),
   });
   document.head.append(ld);
   render();

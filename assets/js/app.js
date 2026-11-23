@@ -20,7 +20,7 @@
   const wa = (msg) => (phoneDigits ? `https://wa.me/52${phoneDigits}` + (msg ? `?text=${encodeURIComponent(msg)}` : "") : "#contacto");
   const phoneText = phoneDigits.length === 10 ? phoneDigits.replace(/(\d{3})(\d{3})(\d{4})/, "$1 $2 $3") : CFG.phone;
 
-  // Imagen responsiva desde el CDN de Shopify (acepta &width=).
+  // Imagen responsiva: las fotos de producto están en cdn.shopify.com, que acepta &width=.
   function img(src, { widths = [240, 360, 480, 720], sizes = "50vw", alt = "", eager = false, w = 1, h = 1 } = {}) {
     if (!src) return "";
     const u = (x) => src + (src.includes("?") ? "&" : "?") + "width=" + x;
@@ -107,8 +107,7 @@
     items() { return cart.read().map((l) => ({ ...l, ...BY_VARIANT[l.id] })); },
     total() { return cart.items().reduce((s, l) => s + l.v.price * l.qty, 0); },
     count() { return cart.read().reduce((s, l) => s + l.qty, 0); },
-    // Permalink de carrito de Shopify: lleva al checkout nativo (permite comprar como invitado).
-    checkoutUrl() { return `${CFG.store}/cart/${cart.read().map((l) => `${l.id}:${l.qty}`).join(",")}`; },
+    clear() { cart.write([]); },
   };
   function updateCount() {
     const n = cart.count();
@@ -184,7 +183,6 @@
           <nav class="main-nav" id="main-nav" aria-label="Principal"><ul>${navItems}</ul></nav>
           <div class="header-search">${searchHTML("q-desk")}</div>
           <div class="header-actions">
-            <a class="icon-btn" href="${CFG.store}/account" aria-label="Iniciar sesión o ver mi cuenta">${ICON.user}<span class="account-label">Iniciar sesión</span></a>
             <a class="icon-btn" href="carrito.html" data-cart-link aria-label="Carrito">${ICON.cart}<span class="cart-count" hidden>0</span></a>
           </div>
         </div>
@@ -207,14 +205,14 @@
         <div class="footer-grid">
           <div><h2>GrandPET®</h2><p>Empresa familiar 100% mexicana, fundada y ubicada en Guanajuato. Nuestra misión: mejorar la calidad de vida de las mascotas para crear felicidad.</p>
             <p><a href="https://grandpet.com/acerca/">Conoce GrandPET</a></p></div>
-          <div><h2>Compra</h2><ul>${NAV.map(([k, t]) => `<li><a href="coleccion.html?c=${k}">${t}</a></li>`).join("")}<li><a href="coleccion.html?c=paquetes">Paquetes de ahorro</a></li><li><a href="${CFG.store}/account">Mi cuenta</a></li></ul></div>
+          <div><h2>Compra</h2><ul>${NAV.map(([k, t]) => `<li><a href="coleccion.html?c=${k}">${t}</a></li>`).join("")}<li><a href="coleccion.html?c=paquetes">Paquetes de ahorro</a></li></ul></div>
           <div><h2>Ayuda</h2><ul>
             <li><a href="${tel}">Llámanos: ${esc(phoneText)}</a></li>
             <li><a href="${wa("Hola, tengo una pregunta sobre GrandPET")}">WhatsApp: ${esc(phoneText)}</a></li>
-            <li><a href="${CFG.store}/policies/shipping-policy">Política de envíos</a></li>
-            <li><a href="${CFG.store}/policies/refund-policy">Cambios y devoluciones</a></li>
-            <li><a href="${CFG.store}/policies/privacy-policy">Aviso de privacidad</a></li>
-            <li><a href="${CFG.store}/policies/terms-of-service">Términos y condiciones</a></li></ul></div>
+            <li><a href="politicas.html#envios">Política de envíos</a></li>
+            <li><a href="politicas.html#devoluciones">Cambios y devoluciones</a></li>
+            <li><a href="politicas.html#privacidad">Aviso de privacidad</a></li>
+            <li><a href="politicas.html#terminos">Términos y condiciones</a></li></ul></div>
         </div>
         <p class="footer-legal">© ${new Date().getFullYear()} GrandPET®. Envíos nacionales · Envío gratis desde ${money(CFG.freeShipping)} MXN, sujeto a cobertura.</p>
       </div></footer>
