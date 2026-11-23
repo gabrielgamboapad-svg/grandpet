@@ -1,8 +1,11 @@
 // Ajustes del sitio. Este es el ÚNICO lugar donde se cambian teléfono, envío y promociones.
 window.GP_CONFIG = {
-  // Teléfono principal, 10 dígitos sin espacios (ej. 4771234567). Se usa en footer, ficha de producto,
-  // carrito, enlaces tel: y WhatsApp (wa.me/52...). Los pedidos del carrito llegan a este WhatsApp.
-  phone: "PHONE_PRINCIPAL",
+  // Teléfono para llamadas (enlaces tel:), 10 dígitos. Es el que publica grandpet.com.
+  phone: "3521440509",
+
+  // WhatsApp que recibe los pedidos del carrito (wa.me/52...), 10 dígitos. Mientras diga
+  // PHONE_PRINCIPAL, el botón de pedido queda desactivado.
+  whatsapp: "PHONE_PRINCIPAL",
 
   // Envío gratis desde este monto (MXN), sujeto a cobertura.
   freeShipping: 999,

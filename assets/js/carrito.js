@@ -4,7 +4,7 @@
   const { cart, img, esc, money, priceHTML, shipProgressHTML, CFG, url, wa, tel } = window.GP;
   const root = document.getElementById("cart");
   const KEY = "gp_cliente";
-  const phoneOk = /^\d{10}$/.test(String(CFG.phone).replace(/\D/g, ""));
+  const phoneOk = window.GP.waOk; // hay WhatsApp configurado en config.js
   const saved = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch { return {}; } })();
   const FIELDS = [
     ["nombre", "Nombre completo", "text", 'autocomplete="name" required maxlength="80"'],
@@ -53,7 +53,7 @@
           <label class="check"><input type="checkbox" name="recordar"${saved.nombre ? " checked" : ""}> Recordar mis datos en este dispositivo para comprar más rápido</label>
           <p class="form-error" id="form-error" role="alert" hidden></p>
           <button class="btn btn-primary btn-block" type="submit"${phoneOk ? "" : " disabled"}>Enviar pedido por WhatsApp</button>
-          ${phoneOk ? "" : `<p class="form-error">Los pedidos por WhatsApp se activan cuando se configure el teléfono de la tienda.</p>`}
+          ${phoneOk ? "" : `<p class="form-error">Los pedidos por WhatsApp se activan cuando se configure el WhatsApp de la tienda. Mientras, llámanos al <a href="${tel}">${esc(window.GP.phoneText)}</a>.</p>`}
           <small>No necesitas crear una cuenta. Al enviar aceptas el <a href="politicas.html#privacidad">aviso de privacidad</a>.</small>
         </form>
         <small>¿Dudas? <a href="${tel}">Llámanos</a>.</small>

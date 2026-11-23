@@ -167,7 +167,45 @@ p { margin: 0 0 1em; }
 .carousel-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
 .carousel-head h2 { margin: 0; }
 .carousel-head a { font-weight: 800; white-space: nowrap; }
+.carousel-controls { display: flex; gap: 8px; flex: none; }
 .carousel-arrows { display: none; gap: 8px; }
+.arrow.play { font-size: .85rem; letter-spacing: -1px; }
+
+/* ---------- Selector guiado ---------- */
+.guide { background: var(--blanco); border-radius: var(--radio-lg); box-shadow: var(--sombra); padding: 20px 18px; display: grid; gap: 12px; border-top: 6px solid var(--amarillo); }
+.guide h2 { margin: 0; }
+.guide-sub, .section-sub { color: var(--cafe-suave); margin: 0; max-width: 70ch; }
+.section-sub { margin-bottom: 16px; }
+.guide-steps { display: grid; gap: 12px; }
+.guide fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.guide legend { font-weight: 800; padding: 0; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.step-n { width: 28px; height: 28px; border-radius: 50%; background: var(--verde); color: var(--blanco); display: grid; place-items: center; font-size: .9rem; flex: none; }
+.guide-opts { display: flex; flex-wrap: wrap; gap: 8px; }
+.guide-chip { position: relative; }
+.guide-chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.guide-chip span { display: inline-flex; align-items: center; gap: 4px; min-height: 44px; padding: 0 16px; border-radius: 999px; border: 2px solid var(--borde); background: var(--crema); font-weight: 800; cursor: pointer; }
+.guide-chip small { font-weight: 600; color: var(--cafe-suave); }
+.guide-chip input:checked + span { border-color: var(--verde); background: var(--verde); color: var(--blanco); }
+.guide-chip input:checked + span small { color: var(--verde-claro); }
+.guide-chip input:focus-visible + span { outline: 3px solid var(--verde); outline-offset: 3px; }
+.guide .btn { justify-self: stretch; }
+
+/* ---------- Marcas y quiénes somos ---------- */
+.brands { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.brand-card { background: var(--blanco); border-radius: var(--radio); box-shadow: var(--sombra); padding: 14px; display: grid; grid-template-columns: 84px 1fr; gap: 14px; align-items: start; }
+.brand-media { aspect-ratio: 3 / 4; background: #FBF4EA; border-radius: 12px; padding: 6px; }
+.brand-media img { width: 100%; height: 100%; object-fit: contain; }
+.brand-card h3 { margin: 0 0 4px; font-size: 1.2rem; }
+.brand-card p { font-size: .93rem; color: var(--cafe-suave); margin-bottom: 8px; }
+.about { background: var(--blanco); border-radius: var(--radio-lg); box-shadow: var(--sombra); padding: 22px 18px; display: grid; gap: 20px; }
+.about-points { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.about-points li { background: var(--crema); border-radius: var(--radio); padding: 14px; display: grid; gap: 2px; }
+.about-points strong { font-family: var(--titulos); font-size: 1.1rem; color: var(--verde); }
+.about-points span { font-size: .95rem; }
+.cert { font-weight: 800; color: var(--verde); font-size: .9rem; }
+.brand-note { background: var(--verde-claro); border-radius: var(--radio); padding: 16px 18px; }
+.brand-note h2 { font-size: 1.25rem; margin: 0 0 6px; }
+.brand-note p { margin-bottom: 8px; }
 .arrow {
   width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--borde); background: var(--blanco); color: var(--cafe);
   display: grid; place-items: center; cursor: pointer; font-size: 1rem;
@@ -347,6 +385,10 @@ p { margin: 0 0 1em; }
   .footer-grid { grid-template-columns: repeat(3, 1fr); }
   .account-label { display: inline; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .cart-layout { grid-template-columns: 1fr 340px; }
+  .brands { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  .about-points { grid-template-columns: repeat(2, 1fr); }
+  .guide { padding: 24px; }
+  .guide .btn { justify-self: start; }
 }
 
 /* ---------- Escritorio ---------- */
@@ -372,6 +414,9 @@ p { margin: 0 0 1em; }
   .pdp-gallery { position: sticky; top: 90px; }
   .pdp-extra { grid-column: 1 / -1; }
   .site-footer { padding-bottom: 24px; }
+  .guide-steps { grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .brands { grid-template-columns: repeat(3, 1fr); }
+  .about { grid-template-columns: 1fr 1.1fr; padding: 40px; align-items: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {

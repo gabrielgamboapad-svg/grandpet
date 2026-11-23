@@ -15,10 +15,24 @@
   const today = () => new Date(new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
   const inRange = (r) => { const d = today(); d.setHours(0, 0, 0, 0); return !!r && new Date(r.start + "T00:00:00") <= d && d <= new Date(r.end + "T00:00:00"); };
   const fmtDate = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("es-MX", { day: "numeric", month: "long" });
-  const phoneDigits = String(CFG.phone).replace(/\D/g, "");
-  const tel = phoneDigits ? `tel:+52${phoneDigits}` : "#contacto";
-  const wa = (msg) => (phoneDigits ? `https://wa.me/52${phoneDigits}` + (msg ? `?text=${encodeURIComponent(msg)}` : "") : "#contacto");
-  const phoneText = phoneDigits.length === 10 ? phoneDigits.replace(/(\d{3})(\d{3})(\d{4})/, "$1 $2 $3") : CFG.phone;
+  const digits = (s) => String(s || "").replace(/\D/g, "");
+  const phoneDigits = digits(CFG.phone);
+  const waDigits = digits(CFG.whatsapp);
+  const waOk = waDigits.length === 10;
+  const tel = phoneDigits.length === 10 ? `tel:+52${phoneDigits}` : "#contacto";
+  const wa = (msg) => (waOk ? `https://wa.me/52${waDigits}` + (msg ? `?text=${encodeURIComponent(msg)}` : "") : "#contacto");
+  const phoneText = phoneDigits.length === 10 ? phoneDigits.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2 $3") : CFG.phone;
+  const waText = waOk ? waDigits.replace(/(\d{3})(\d{3})(\d{4})/, "($1) $2 $3") : "";
+
+  // Marcas: textos tomados de grandpet.com.
+  const BRANDS = {
+    "Natural Gourmet": "0% granos y sin sabores, colores ni conservadores artificiales. Una dieta rica en carne, frutos del bosque, vegetales y grasas de alta calidad, como la naturaleza la proporciona.",
+    "Back 2 Nature": "Alimento holístico, libre de granos y gluten, con proteínas de alto valor biológico como cordero, salmón, cerdo, pavo y pescado. Sin saborizantes, colorantes ni conservadores artificiales.",
+    "Carne Fresca": "Contiene carne que no ha sido congelada: proteínas de alto valor biológico y alta digestibilidad. Enriquecido con hierbas funcionales y con menos de 30% de carbohidratos (arroz y avena).",
+    Magno: "Contiene carne que no ha sido congelada, con proteínas de alta digestibilidad que cubren sus requerimientos con menor cantidad de alimento, y hierbas funcionales para su digestión.",
+    Noble: "Alimento premium, con amor del bueno: una combinación de ingredientes que da vitalidad y un sistema inmune saludable, con alta digestibilidad y bajas grasas saturadas.",
+    Kisha: "Porque su ronroneo, incondicionalidad y suavidad nos conquistan: alimento hecho con amor que ayuda a mantener sano a tu gato.",
+  };
 
   // Imagen responsiva: las fotos de producto están en cdn.shopify.com, que acepta &width=.
   function img(src, { widths = [240, 360, 480, 720], sizes = "50vw", alt = "", eager = false, w = 1, h = 1 } = {}) {
@@ -208,15 +222,15 @@
           <div><h2>Compra</h2><ul>${NAV.map(([k, t]) => `<li><a href="coleccion.html?c=${k}">${t}</a></li>`).join("")}<li><a href="coleccion.html?c=paquetes">Paquetes de ahorro</a></li></ul></div>
           <div><h2>Ayuda</h2><ul>
             <li><a href="${tel}">Llámanos: ${esc(phoneText)}</a></li>
-            <li><a href="${wa("Hola, tengo una pregunta sobre GrandPET")}">WhatsApp: ${esc(phoneText)}</a></li>
+            ${waOk ? `<li><a href="${wa("Hola, tengo una pregunta sobre GrandPET")}">WhatsApp: ${esc(waText)}</a></li>` : ""}
             <li><a href="politicas.html#envios">Política de envíos</a></li>
             <li><a href="politicas.html#devoluciones">Cambios y devoluciones</a></li>
             <li><a href="politicas.html#privacidad">Aviso de privacidad</a></li>
             <li><a href="politicas.html#terminos">Términos y condiciones</a></li></ul></div>
         </div>
-        <p class="footer-legal">© ${new Date().getFullYear()} GrandPET®. Envíos nacionales · Envío gratis desde ${money(CFG.freeShipping)} MXN, sujeto a cobertura.</p>
+        <p class="footer-legal">© ${new Date().getFullYear()} GrandPET®. Certificado FSSC 22000 (sistema de gestión de seguridad alimentaria), certificado MEXF-0028. Envíos nacionales · Envío gratis desde ${money(CFG.freeShipping)} MXN, sujeto a cobertura.</p>
       </div></footer>
-      <a class="wa-float" href="${wa("Hola, tengo una pregunta sobre GrandPET")}" aria-label="Escríbenos por WhatsApp">${ICON.wa}</a>`;
+      ${waOk ? `<a class="wa-float" href="${wa("Hola, tengo una pregunta sobre GrandPET")}" aria-label="Escríbenos por WhatsApp">${ICON.wa}</a>` : ""}`;
     }
     document.querySelectorAll("[data-phone]").forEach((a) => { a.href = tel; a.textContent = phoneText; });
     document.querySelectorAll("[data-whatsapp]").forEach((a) => { a.href = wa(a.dataset.whatsapp); });
@@ -247,7 +261,7 @@
   }
   const noResultsHTML = (q) => `<p class="muted">No encontramos “${esc(q)}”. Prueba con:</p>
     <div class="chips">${[["perro", "Perro"], ["gato", "Gato"], ["premios", "Premios"], ["humedo", "Alimento húmedo"], ["cachorros", "Cachorros"]].map(([k, t]) => `<a class="chip" href="coleccion.html?c=${k}">${t}</a>`).join("")}</div>
-    <p class="muted">¿Buscas algo específico? <a href="${wa("Hola, busco: " + q)}">Pregúntanos por WhatsApp</a></p>`;
+    <p class="muted">¿Buscas algo específico? ${waOk ? `<a href="${wa("Hola, busco: " + q)}">Pregúntanos por WhatsApp</a>` : `<a href="${tel}">Llámanos al ${esc(phoneText)}</a>`}</p>`;
 
   function initSearch(form) {
     const input = form.querySelector("input");
@@ -282,24 +296,29 @@
   }
 
   // ---------- carrusel: CSS scroll-snap + JS mínimo ----------
-  // Uso: <section data-carousel data-collection="perro" data-title="Para perro" data-limit="10" [data-autoplay="6"] [data-eager]></section>
-  function initCarousel(sec) {
-    const key = sec.dataset.collection;
+  // Uso: <section data-carousel data-collection="perro" data-title="Para perro" data-limit="10" [data-autoplay="4"] [data-eager]></section>
+  // o GP.initCarousel(seccion, listaDeProductos) para una lista propia (p. ej. relacionados).
+  function initCarousel(sec, list) {
+    const key = sec.dataset.collection || "todo";
     const limit = Number(sec.dataset.limit || 10);
     const eager = sec.hasAttribute("data-eager");
-    const items = collection(key, limit);
+    const items = list ? list.slice(0, limit) : collection(key, limit);
     if (!items.length) return sec.remove();
     const title = sec.dataset.title || COLLECTIONS[key].title;
-    const id = "c-" + key;
+    const id = "c-" + (sec.id || key);
+    const secs = Number(sec.dataset.autoplay || 0);
+    const auto = secs && !reduceMotion;
     sec.setAttribute("role", "region");
-    sec.setAttribute("aria-label", `Carrusel: ${title}`);
+    sec.setAttribute("aria-roledescription", "carrusel");
+    sec.setAttribute("aria-label", title);
     sec.innerHTML = `<div class="wrap">
       <div class="carousel-head"><h2 id="${id}-t">${esc(title)}</h2>
-        <div class="carousel-arrows"><button class="arrow" type="button" data-dir="-1" aria-label="Productos anteriores de ${esc(title)}">◀</button><button class="arrow" type="button" data-dir="1" aria-label="Más productos de ${esc(title)}">▶</button></div></div>
+        <div class="carousel-controls">${auto ? `<button class="arrow play" type="button" aria-pressed="false" aria-label="Pausar desplazamiento automático de ${esc(title)}">❚❚</button>` : ""}
+        <div class="carousel-arrows"><button class="arrow" type="button" data-dir="-1" aria-label="Productos anteriores de ${esc(title)}">◀</button><button class="arrow" type="button" data-dir="1" aria-label="Más productos de ${esc(title)}">▶</button></div></div></div>
       <ul class="track" tabindex="0" aria-labelledby="${id}-t">${items.map((p, i) => `<li>${cardHTML(p, { eager: eager && i < 2 })}</li>`).join("")}</ul>
-      <p><a class="link-quiet" href="coleccion.html?c=${key}">Ver todo: ${esc(title)} →</a></p></div>`;
+      ${list ? "" : `<p><a class="link-quiet" href="coleccion.html?c=${key}">Ver todo: ${esc(title)} →</a></p>`}</div>`;
     const track = sec.querySelector(".track");
-    const [prev, next] = sec.querySelectorAll(".arrow");
+    const [prev, next] = sec.querySelectorAll("[data-dir]");
     const step = () => (track.querySelector("li")?.offsetWidth || 200) + 14;
     const atEnd = () => track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
     const go = (dir) => track.scrollBy({ left: dir * Math.max(step(), track.clientWidth - step() * 0.5), behavior: reduceMotion ? "auto" : "smooth" });
@@ -347,18 +366,29 @@
       track.scrollBy({ left: e.deltaY, behavior: "auto" });
     }, { passive: false });
 
-    // Autoplay lento opcional (desactivado por defecto). Pausa con toque, hover o foco; respeta reduced-motion.
-    const secs = Number(sec.dataset.autoplay || 0);
-    if (secs && !reduceMotion) {
-      let paused = false;
-      const pause = () => (paused = true), resume = () => (paused = false);
-      sec.addEventListener("pointerenter", pause); sec.addEventListener("pointerleave", resume);
-      sec.addEventListener("focusin", pause); sec.addEventListener("focusout", resume);
-      sec.addEventListener("touchstart", pause, { passive: true });
+    // Desplazamiento automático (data-autoplay="segundos"). Se pausa con hover, foco o toque (y se reanuda
+    // al soltar), con el botón ❚❚ de forma permanente, y no corre con prefers-reduced-motion ni fuera de pantalla.
+    if (auto) {
+      let hold = false, stopped = false, visible = true, touchTimer;
+      const pauseBtn = sec.querySelector(".play");
+      const setStopped = (v) => {
+        stopped = v;
+        pauseBtn.setAttribute("aria-pressed", v);
+        pauseBtn.textContent = v ? "▶" : "❚❚";
+        pauseBtn.setAttribute("aria-label", `${v ? "Reanudar" : "Pausar"} desplazamiento automático de ${title}`);
+      };
+      pauseBtn.onclick = () => setStopped(!stopped);
+      sec.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") hold = true; });
+      sec.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") hold = false; });
+      sec.addEventListener("focusin", (e) => { if (e.target !== pauseBtn) hold = true; });
+      sec.addEventListener("focusout", () => (hold = false));
+      sec.addEventListener("touchstart", () => { hold = true; clearTimeout(touchTimer); }, { passive: true });
+      sec.addEventListener("touchend", () => { touchTimer = setTimeout(() => (hold = false), 5000); }, { passive: true });
+      new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(track);
       setInterval(() => {
-        if (paused || document.hidden) return;
+        if (hold || stopped || !visible || document.hidden) return;
         if (atEnd()) track.scrollTo({ left: 0 }); else track.scrollBy({ left: step() });
-      }, Math.max(4, secs) * 1000);
+      }, Math.max(3, secs) * 1000);
     }
   }
 
@@ -374,10 +404,10 @@
     if (ogd) ogd.content = desc;
   }
 
-  window.GP = { CFG, PRODUCTS, BY_HANDLE, COLLECTIONS, collection, cart, cardHTML, priceHTML, tagsHTML, img, money, esc, norm, search, noResultsHTML, shipProgressHTML, setMeta, petLabel, tel, wa, phoneText, ICON, url };
+  window.GP = { CFG, PRODUCTS, BY_HANDLE, COLLECTIONS, collection, cart, cardHTML, priceHTML, tagsHTML, img, money, esc, norm, search, noResultsHTML, shipProgressHTML, setMeta, petLabel, tel, wa, waOk, phoneText, ICON, url, BRANDS, initCarousel };
 
   renderChrome();
   document.querySelectorAll("[data-search]").forEach(initSearch);
-  document.querySelectorAll("[data-carousel]").forEach(initCarousel);
+  document.querySelectorAll("[data-carousel]").forEach((s) => initCarousel(s));
   addEventListener("storage", (e) => { if (e.key === KEY) { updateCount(); document.dispatchEvent(new CustomEvent("cart:change")); } });
 })();

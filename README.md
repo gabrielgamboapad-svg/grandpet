@@ -11,7 +11,7 @@ python -m http.server 8080
 Abrir http://localhost:8080
 
 ## Ajustes (un solo archivo)
-`assets/js/config.js`: teléfono/WhatsApp (`PHONE_PRINCIPAL`; sin él, el botón de pedido queda desactivado),
+`assets/js/config.js`: teléfono de llamadas, WhatsApp de pedidos (`PHONE_PRINCIPAL`; sin él, el botón de pedido queda desactivado),
 monto de envío gratis, fechas de la sección Ofertas y banners de promoción con fecha de inicio y fin.
 
 ## Actualizar productos, precios y políticas
@@ -23,7 +23,7 @@ Regenera `data/products.js` y `data/policies.js` a partir de la información pú
 ## Carruseles de la portada
 En `index.html`, cada `<section data-carousel>` se configura con `data-title`, `data-collection`
 (`perro`, `gato`, `premios`, `humedo`, `accesorios`, `ofertas`, `cachorros`, `gatitos`, `paquetes`,
-`mas-vendidos`, `todo`), `data-limit` y `data-autoplay="6"` (opcional, apagado por defecto).
+`mas-vendidos`, `todo`), `data-limit` y `data-autoplay` (segundos entre avances; se pausa con mouse, foco, toque o el botón ❚❚).
 
 ## Publicación
 GitHub Pages publica la rama `main` automáticamente.

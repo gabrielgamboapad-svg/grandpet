@@ -1,7 +1,7 @@
 /* Ficha de producto. Orden: nombre+mascota+etapa → galería → tamaño → beneficios → precio → compra+envío → acordeones. */
 (function () {
   "use strict";
-  const { BY_HANDLE, COLLECTIONS, priceHTML, tagsHTML, img, esc, money, setMeta, wa, ICON, CFG, petLabel } = window.GP;
+  const { BY_HANDLE, COLLECTIONS, PRODUCTS, BRANDS, priceHTML, tagsHTML, img, esc, money, setMeta, wa, waOk, tel, phoneText, ICON, CFG, petLabel, initCarousel } = window.GP;
   const params = new URLSearchParams(location.search);
   const p = BY_HANDLE[params.get("p")];
   const root = document.getElementById("pdp");
@@ -63,13 +63,14 @@
 
     <div class="pdp-extra">
       ${ACC.length ? `<div class="accordion">${ACC.map(([k, t], i) => `<details${i === 0 ? " open" : ""}><summary>${t}</summary><div class="acc-body">${p.sections[k]}</div></details>`).join("")}</div>` : ""}
+      ${BRANDS[p.brand] ? `<div class="brand-note"><h2>Sobre ${esc(p.brand)}®</h2><p>${esc(BRANDS[p.brand])}</p><a class="link-quiet" href="coleccion.html?c=todo&amp;brand=${encodeURIComponent(p.brand)}">Ver toda la línea ${esc(p.brand)} →</a></div>` : ""}
       <h2 id="resenas">Reseñas</h2>
       <div class="accordion"><details><summary>Opiniones de clientes</summary><div class="acc-body"><p>Aún no hay reseñas de este producto.</p></div></details></div>
       <h2>Preguntas frecuentes</h2>
       <div class="accordion">
         <details><summary>¿Hacen envíos a todo México?</summary><div class="acc-body"><p>Hacemos envíos nacionales. El envío es gratis desde ${money(CFG.freeShipping)} MXN, sujeto a cobertura. Consulta la <a href="politicas.html#envios">política de envíos</a>.</p></div></details>
         <details><summary>¿Cómo hago mi pedido?</summary><div class="acc-body"><p>Agrega tus productos al carrito, llena tus datos de entrega y envía el pedido por WhatsApp. Te confirmamos disponibilidad, costo de envío y forma de pago. No necesitas crear una cuenta.</p></div></details>
-        <details><summary>¿Tienes dudas sobre qué alimento elegir?</summary><div class="acc-body"><p>Escríbenos por <a href="${wa("Hola, tengo una duda sobre " + p.title)}">WhatsApp</a> y te ayudamos a elegir según la edad y tamaño de tu mascota.</p></div></details>
+        <details><summary>¿Tienes dudas sobre qué alimento elegir?</summary><div class="acc-body"><p>${waOk ? `Escríbenos por <a href="${wa("Hola, tengo una duda sobre " + p.title)}">WhatsApp</a>` : `Llámanos al <a href="${tel}">${esc(phoneText)}</a>`} y te ayudamos a elegir según la edad y tamaño de tu mascota.</p></div></details>
       </div>
       <h2>Cambios y devoluciones</h2>
       <div class="accordion"><details><summary>Política de devoluciones</summary><div class="acc-body"><p>Revisa las condiciones en nuestra <a href="politicas.html#devoluciones">política de cambios y devoluciones</a>.</p></div></details></div>
@@ -117,4 +118,17 @@
   });
   document.head.append(ld);
   render();
+
+  // Productos relacionados: misma mascota y etapa; primero otros formatos (p. ej. croqueta → húmedo, premios).
+  const related = PRODUCTS.filter((x) => x !== p && (x.pet === p.pet || x.pet === "ambos" || p.pet === "ambos")
+    && (!p.stage || !x.stage || x.stage === p.stage) && x.variants.some((v) => v.available))
+    .sort((a, b) => (b.stage === p.stage) - (a.stage === p.stage) || (a.format === p.format) - (b.format === p.format) || a.rank - b.rank);
+  const sec = document.createElement("section");
+  sec.className = "section";
+  sec.id = "relacionados";
+  sec.dataset.title = "También te puede interesar";
+  sec.dataset.limit = "10";
+  sec.dataset.autoplay = "4";
+  document.getElementById("main").after(sec);
+  initCarousel(sec, related);
 })();

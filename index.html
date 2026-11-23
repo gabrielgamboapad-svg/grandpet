@@ -24,14 +24,14 @@
       <div class="wrap">
         <div class="hero-card">
           <div>
-            <span class="hero-kicker">Hecho en Guanajuato, México</span>
+            <span class="hero-kicker">Empresa 100% mexicana · Guanajuato</span>
             <h1 id="hero-t">Nutrición para cada etapa de su vida.</h1>
             <p class="hero-sub">Somos una empresa familiar mexicana, fundada en Guanajuato. Creamos alimentos y premios para perros y gatos, comprometidos con su bienestar.</p>
             <div class="hero-ctas">
               <a class="btn btn-primary" href="coleccion.html?c=perro">Comprar para perro</a>
               <a class="btn btn-secondary" href="coleccion.html?c=gato">Comprar para gato</a>
             </div>
-            <p class="hero-more"><a class="link-quiet" href="https://grandpet.com/acerca/">Conoce GrandPET</a></p>
+            <p class="hero-more"><a class="link-quiet" href="#quienes-somos">Conoce GrandPET</a> · <span class="cert">Certificación FSSC 22000</span></p>
           </div>
           <div class="hero-art" aria-hidden="true">
             <img src="https://cdn.shopify.com/s/files/1/0095/4223/8266/files/Carne_Fresca_Force_20_Kg_1_Kg_Gratis.jpg?v=1794587382&amp;width=600"
@@ -47,19 +47,60 @@
       </div>
     </section>
 
-    <!-- Carruseles reutilizables. Configura cada uno con atributos:
+    <!-- Selector guiado: mascota → etapa → formato (lo arma assets/js/inicio.js con los datos reales) -->
+    <section class="section guide-section" aria-labelledby="guide-t">
+      <div class="wrap">
+        <form class="guide" id="guide">
+          <h2 id="guide-t">Encuentra su alimento en 3 pasos</h2>
+          <p class="guide-sub">Responde lo que ya sabes de tu mascota y te mostramos solo lo que le queda.</p>
+          <div class="guide-steps"></div>
+          <a class="btn btn-primary" id="guide-go" href="coleccion.html?c=perro">Ver recomendaciones</a>
+        </form>
+      </div>
+    </section>
+
+    <!-- Carruseles reutilizables, se desplazan solos. Configura cada uno con atributos:
          data-title, data-collection (perro, gato, premios, humedo, accesorios, ofertas, cachorros, gatitos,
-         paquetes, mas-vendidos, todo), data-limit (cantidad) y data-autoplay="6" para activar autoplay. -->
-    <section class="section" data-carousel data-collection="mas-vendidos" data-title="Más vendidos" data-limit="10" data-eager></section>
-    <section class="section" data-carousel data-collection="perro" data-title="Para perro" data-limit="10"></section>
-    <section class="section" data-carousel data-collection="gato" data-title="Para gato" data-limit="10"></section>
-    <section class="section" data-carousel data-collection="humedo" data-title="Alimento húmedo" data-limit="10"></section>
-    <section class="section" data-carousel data-collection="paquetes" data-title="Paquetes de ahorro" data-limit="10"></section>
+         paquetes, mas-vendidos, todo), data-limit (cantidad) y data-autoplay (segundos entre avances). -->
+    <section class="section" data-carousel data-collection="mas-vendidos" data-title="Más vendidos" data-limit="10" data-autoplay="4" data-eager></section>
+    <section class="section" data-carousel data-collection="perro" data-title="Para perro" data-limit="10" data-autoplay="5"></section>
+    <section class="section" data-carousel data-collection="gato" data-title="Para gato" data-limit="10" data-autoplay="4"></section>
+
+    <section class="section" aria-labelledby="marcas-t">
+      <div class="wrap">
+        <h2 id="marcas-t">Nuestras marcas</h2>
+        <p class="section-sub">Elaboramos y comercializamos nuestras marcas de alimento cubriendo todas las etapas de tu mascota, priorizando su desarrollo y bienestar.</p>
+        <ul class="brands" id="brands"></ul>
+      </div>
+    </section>
+
+    <section class="section" data-carousel data-collection="humedo" data-title="Alimento húmedo" data-limit="10" data-autoplay="5"></section>
+    <section class="section" data-carousel data-collection="paquetes" data-title="Paquetes de ahorro" data-limit="10" data-autoplay="4"></section>
+
+    <section class="section" id="quienes-somos" aria-labelledby="qs-t">
+      <div class="wrap">
+        <div class="about">
+          <div>
+            <span class="hero-kicker">Conócenos</span>
+            <h2 id="qs-t">GrandPET®: el bienestar de tu mascota es nuestro compromiso</h2>
+            <p>GrandPET® nace ante la importancia que han generado las mascotas en nuestras familias, constituyéndose como una de las empresas más importantes en la nutrición de las mascotas en nuestro país. Fundada en el estado de Guanajuato, somos una empresa familiar 100% mexicana.</p>
+            <p><strong>Misión:</strong> mejorar la calidad de vida de las mascotas para crear felicidad.</p>
+          </div>
+          <ul class="about-points">
+            <li><strong>Todas las etapas</strong><span>Alimentos que cubren todas las etapas de tu mascota, priorizando su desarrollo y bienestar.</span></li>
+            <li><strong>Premios naturales</strong><span>Ese plus para que cada ocasión sea diferente, agregando premios naturales a su dieta.</span></li>
+            <li><strong>Nuestra planta</strong><span>La más alta tecnología disponible para crear productos innovadores que proporcionen un óptimo desarrollo integral.</span></li>
+            <li><strong>FSSC 22000</strong><span>Sistema de gestión de seguridad alimentaria certificado, número de certificado MEXF-0028.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
   </main>
 
   <div id="site-footer"></div>
   <script src="data/products.js" defer></script>
   <script src="assets/js/config.js" defer></script>
   <script src="assets/js/app.js" defer></script>
+  <script src="assets/js/inicio.js" defer></script>
 </body>
 </html>

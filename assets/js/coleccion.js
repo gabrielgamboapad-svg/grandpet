@@ -8,12 +8,19 @@
   const coll = COLLECTIONS[key] || COLLECTIONS.todo;
   const base = q ? search(q) : collection(key);
 
-  // Encabezado y meta description única por colección.
-  const title = q ? `Resultados para “${q}”` : coll.title;
+  // Encabezado y meta description única por colección (o por marca, o explicación del selector guiado).
+  const brands = params.getAll("brand");
+  const brand = !q && brands.length === 1 && window.GP.BRANDS[brands[0]] ? brands[0] : "";
+  const FMT = { Seco: "croqueta", "Húmedo": "alimento húmedo", Premio: "premios" };
+  const guide = params.get("guia") && !q
+    ? `Elegiste: ${[coll.title, params.get("stage"), FMT[params.get("format")]].filter(Boolean).join(" · ")}. Estos son los productos que le quedan; puedes ajustar los filtros.`
+    : "";
+  const title = q ? `Resultados para “${q}”` : brand ? `${brand}®` : coll.title;
+  const desc = q ? "" : guide || (brand ? window.GP.BRANDS[brand] : coll.desc);
   document.getElementById("coll-title").textContent = title;
-  document.getElementById("crumb").textContent = q ? "Búsqueda" : coll.title;
-  document.getElementById("coll-desc").textContent = q ? "" : coll.desc;
-  setMeta(q ? `Buscar: ${q} | GrandPET®` : `${coll.title} | GrandPET®`, q ? `Resultados de búsqueda para ${q} en GrandPET.` : coll.desc);
+  document.getElementById("crumb").textContent = q ? "Búsqueda" : title;
+  document.getElementById("coll-desc").textContent = desc;
+  setMeta(q ? `Buscar: ${q} | GrandPET®` : `${title} | GrandPET®`, q ? `Resultados de búsqueda para ${q} en GrandPET.` : (brand ? window.GP.BRANDS[brand] : coll.desc));
 
   // Facetas: solo se muestran las que tienen datos (2+ opciones) en esta colección.
   const minPrice = (p) => Math.min(...p.variants.map((v) => v.price));
