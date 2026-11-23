@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GrandPET® | Alimento y premios para perros y gatos</title>
+  <meta name="description" content="Empresa familiar mexicana de Guanajuato. Alimento seco y húmedo, premios y accesorios para perros y gatos en cada etapa. Envíos nacionales, envío gratis desde $999 MXN.">
+  <meta property="og:title" content="GrandPET® | Nutrición para cada etapa de su vida">
+  <meta property="og:description" content="Alimentos y premios para perros y gatos, hechos en Guanajuato por una empresa familiar mexicana.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#FFF8EF">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+  <div id="site-header"></div>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-t">
+      <div class="wrap">
+        <div class="hero-card">
+          <div>
+            <span class="hero-kicker">Hecho en Guanajuato, México</span>
+            <h1 id="hero-t">Nutrición para cada etapa de su vida.</h1>
+            <p class="hero-sub">Somos una empresa familiar mexicana, fundada en Guanajuato. Creamos alimentos y premios para perros y gatos, comprometidos con su bienestar.</p>
+            <div class="hero-ctas">
+              <a class="btn btn-primary" href="coleccion.html?c=perro">Comprar para perro</a>
+              <a class="btn btn-secondary" href="coleccion.html?c=gato">Comprar para gato</a>
+            </div>
+            <p class="hero-more"><a class="link-quiet" href="https://grandpet.com/acerca/">Conoce GrandPET</a></p>
+          </div>
+          <div class="hero-art" aria-hidden="true">
+            <img src="https://cdn.shopify.com/s/files/1/0095/4223/8266/files/Carne_Fresca_Force_20_Kg_1_Kg_Gratis.jpg?v=1794587382&amp;width=600"
+                 srcset="https://cdn.shopify.com/s/files/1/0095/4223/8266/files/Carne_Fresca_Force_20_Kg_1_Kg_Gratis.jpg?v=1794587382&amp;width=400 400w,
+                         https://cdn.shopify.com/s/files/1/0095/4223/8266/files/Carne_Fresca_Force_20_Kg_1_Kg_Gratis.jpg?v=1794587382&amp;width=600 600w"
+                 sizes="40vw" alt="" width="567" height="756" loading="lazy" decoding="async">
+          </div>
+        </div>
+        <ul class="trust" aria-label="Envíos">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="18" r="1.8"/><circle cx="17" cy="18" r="1.8"/></svg>Envíos nacionales</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 11h16v9H4zM3 7h18v4H3zM12 7v13"/></svg><span>Envío gratis desde $999 MXN, <small>sujeto a cobertura</small></span></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Carruseles reutilizables. Configura cada uno con atributos:
+         data-title, data-collection (perro, gato, premios, humedo, accesorios, ofertas, cachorros, gatitos,
+         paquetes, mas-vendidos, todo), data-limit (cantidad) y data-autoplay="6" para activar autoplay. -->
+    <section class="section" data-carousel data-collection="mas-vendidos" data-title="Más vendidos" data-limit="10" data-eager></section>
+    <section class="section" data-carousel data-collection="perro" data-title="Para perro" data-limit="10"></section>
+    <section class="section" data-carousel data-collection="gato" data-title="Para gato" data-limit="10"></section>
+    <section class="section" data-carousel data-collection="humedo" data-title="Alimento húmedo" data-limit="10"></section>
+    <section class="section" data-carousel data-collection="paquetes" data-title="Paquetes de ahorro" data-limit="10"></section>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="data/products.js" defer></script>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+</body>
+</html>
