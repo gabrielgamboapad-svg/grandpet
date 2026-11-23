@@ -132,7 +132,7 @@
     const im = p.images[0];
     el.innerHTML = `<div class="toast-row">${im ? img(im.src, { widths: [96, 144], sizes: "48px" }) : ""}<p>Agregado al carrito: ${qty} × ${esc(p.short)}${v.title !== "Default Title" ? " · " + esc(v.title) : ""}</p>
       <button class="icon-btn toast-close" type="button" aria-label="Cerrar aviso">✕</button></div>${shipProgressHTML()}
-      <a class="btn btn-primary btn-block" href="carrito.html">Ver carrito</a>`;
+      <a class="btn btn-primary btn-small btn-block" href="carrito.html">Ver carrito</a>`;
     el.hidden = false;
     el.querySelector(".toast-close").onclick = () => (el.hidden = true);
     clearTimeout(toastTimer);
