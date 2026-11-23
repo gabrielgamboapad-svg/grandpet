@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Productos | GrandPET®</title>
+  <meta name="description" content="Catálogo GrandPET: alimento seco y húmedo, premios y accesorios para perros y gatos.">
+  <meta property="og:title" content="Productos | GrandPET®">
+  <meta property="og:description" content="Catálogo GrandPET: alimento seco y húmedo, premios y accesorios para perros y gatos.">
+  <meta name="theme-color" content="#FFF8EF">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+  <div id="site-header"></div>
+
+  <main id="main" class="wrap">
+    <nav class="breadcrumbs" aria-label="Migas de pan"><a href="index.html">Inicio</a> › <span id="crumb" aria-current="page">Productos</span></nav>
+    <header class="coll-head">
+      <h1 id="coll-title">Productos</h1>
+      <p id="coll-desc"></p>
+    </header>
+
+    <div class="coll-layout">
+      <aside class="filters" id="filters" aria-labelledby="filters-t">
+        <div class="filters-head">
+          <h2 id="filters-t">Filtros</h2>
+          <button class="icon-btn filters-close" type="button" aria-label="Cerrar filtros">✕</button>
+        </div>
+        <form id="filter-form"></form>
+        <div class="filters-apply">
+          <button class="btn btn-secondary" type="button" id="clear-filters">Limpiar</button>
+          <button class="btn btn-primary" type="button" id="see-results">Ver resultados</button>
+        </div>
+      </aside>
+
+      <section aria-labelledby="coll-title">
+        <div class="coll-tools">
+          <button class="btn btn-secondary btn-small open-filters" type="button" aria-controls="filters" aria-expanded="false">Filtrar</button>
+          <p class="result-count" id="result-count" aria-live="polite"></p>
+          <label><span class="sr-only">Ordenar por</span>
+            <select id="sort">
+              <option value="rank">Más vendidos</option>
+              <option value="price-asc">Precio: menor a mayor</option>
+              <option value="price-desc">Precio: mayor a menor</option>
+              <option value="name">Nombre A–Z</option>
+            </select>
+          </label>
+        </div>
+        <ul class="grid" id="grid"></ul>
+      </section>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="data/products.js" defer></script>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+  <script src="assets/js/coleccion.js" defer></script>
+</body>
+</html>
