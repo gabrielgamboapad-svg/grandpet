@@ -203,6 +203,12 @@ def main():
             "benefits": benefits,
             "sections": secs,
         })
+    # Self-check: gatitos nunca deben caer en "cachorros" (era el bug de Kisha Kittens).
+    for x in out:
+        if re.search(r"kitten", norm(x["title"])):
+            assert (x["pet"], x["stage"]) == ("gato", "Gatito"), x["title"]
+        if x["stage"] == "Cachorro":
+            assert x["pet"] == "perro", x["title"]
     OUT.parent.mkdir(exist_ok=True)
     OUT.write_text("// Generado por tools/build_data.py — no editar a mano.\nwindow.PRODUCTS = "
                    + json.dumps(out, ensure_ascii=False) + ";\n", encoding="utf-8")
