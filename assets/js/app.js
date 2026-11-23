@@ -172,6 +172,9 @@
     wa: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.4-.3Z"/></svg>',
   };
   const NAV = [["perro", "Perro"], ["gato", "Gato"], ["premios", "Premios"], ["humedo", "Alimento húmedo"], ["accesorios", "Accesorios"]];
+  // Páginas de la empresa (contenido de grandpet.com). La Huella Dorada solo aparece mientras esté vigente.
+  const CORP = () => [["nosotros.html", "Nosotros"], ["marcas.html", "Marcas"],
+    ...(inRange(CFG.huella) ? [["promociones.html", "La Huella Dorada"]] : []), ["contacto.html", "Contacto"]];
   const currentC = new URLSearchParams(location.search).get("c");
 
   function searchHTML(id) {
@@ -186,14 +189,21 @@
     const promos = (CFG.promos || []).filter(inRange);
     const promoHTML = promos.map((p) => `<div class="promo-bar" role="note">${esc(p.text)}${p.code ? ` · Código <code>${esc(p.code)}</code>` : ""} · Válido hasta el ${fmtDate(p.end)}${p.link ? ` · <a href="${esc(p.link)}">Ver más</a>` : ""}</div>`).join("");
     const ofertas = inRange(CFG.ofertas);
+    const page = location.pathname.split("/").pop() || "index.html";
+    const cur = (href) => (href === page ? ' aria-current="page"' : "");
+    const corp = CORP().map(([href, t]) => `<li class="nav-corp"><a href="${href}"${cur(href)}>${t}</a></li>`).join("");
     const navItems = NAV.map(([k, t]) => `<li><a href="coleccion.html?c=${k}"${currentC === k ? ' aria-current="page"' : ""}>${t}</a></li>`).join("")
-      + (ofertas ? `<li class="nav-ofertas"><a href="coleccion.html?c=ofertas"${currentC === "ofertas" ? ' aria-current="page"' : ""}>Ofertas</a></li>` : "");
+      + (ofertas ? `<li class="nav-ofertas"><a href="coleccion.html?c=ofertas"${currentC === "ofertas" ? ' aria-current="page"' : ""}>Ofertas</a></li>` : "")
+      + `<li class="nav-sep" role="separator"></li>${corp}`;
     const h = document.getElementById("site-header");
     if (h) {
-      h.outerHTML = `${promoHTML}<header class="site-header"><div class="wrap">
+      h.outerHTML = `${promoHTML}<div class="topbar"><div class="wrap">
+        <nav aria-label="GrandPET"><ul>${CORP().map(([href, t]) => `<li><a href="${href}"${cur(href)}>${t}</a></li>`).join("")}</ul></nav>
+        <a href="${tel}">Llámanos ${esc(phoneText)}</a></div></div>
+      <header class="site-header"><div class="wrap">
         <div class="header-row">
           <button class="icon-btn menu-toggle" type="button" aria-expanded="false" aria-controls="main-nav" aria-label="Abrir menú">${ICON.menu}</button>
-          <a class="logo" href="index.html" aria-label="GrandPET, inicio">Grand<span>PET</span></a>
+          <a class="logo" href="index.html"><img src="assets/img/logo-grandpet.webp" alt="GrandPET, inicio" width="220" height="203"></a>
           <nav class="main-nav" id="main-nav" aria-label="Principal"><ul>${navItems}</ul></nav>
           <div class="header-search">${searchHTML("q-desk")}</div>
           <div class="header-actions">
@@ -218,10 +228,11 @@
       f.outerHTML = `<footer class="site-footer" id="contacto"><div class="wrap">
         <div class="footer-grid">
           <div><h2>GrandPET®</h2><p>Empresa familiar 100% mexicana, fundada y ubicada en Guanajuato. Nuestra misión: mejorar la calidad de vida de las mascotas para crear felicidad.</p>
-            <p><a href="https://grandpet.com/acerca/">Conoce GrandPET</a></p></div>
+            <p><a href="nosotros.html">Conoce GrandPET</a></p><ul>${CORP().filter(([h]) => h !== "nosotros.html").map(([h, t]) => `<li><a href="${h}">${t}</a></li>`).join("")}</ul></div>
           <div><h2>Compra</h2><ul>${NAV.map(([k, t]) => `<li><a href="coleccion.html?c=${k}">${t}</a></li>`).join("")}<li><a href="coleccion.html?c=paquetes">Paquetes de ahorro</a></li></ul></div>
           <div><h2>Ayuda</h2><ul>
             <li><a href="${tel}">Llámanos: ${esc(phoneText)}</a></li>
+            <li><a href="mailto:${CFG.email}">${esc(CFG.email)}</a></li>
             ${waOk ? `<li><a href="${wa("Hola, tengo una pregunta sobre GrandPET")}">WhatsApp: ${esc(waText)}</a></li>` : ""}
             <li><a href="politicas.html#envios">Política de envíos</a></li>
             <li><a href="politicas.html#devoluciones">Cambios y devoluciones</a></li>
@@ -404,7 +415,7 @@
     if (ogd) ogd.content = desc;
   }
 
-  window.GP = { CFG, PRODUCTS, BY_HANDLE, COLLECTIONS, collection, cart, cardHTML, priceHTML, tagsHTML, img, money, esc, norm, search, noResultsHTML, shipProgressHTML, setMeta, petLabel, tel, wa, waOk, phoneText, ICON, url, BRANDS, initCarousel };
+  window.GP = { CFG, PRODUCTS, BY_HANDLE, COLLECTIONS, collection, cart, cardHTML, priceHTML, tagsHTML, img, money, esc, norm, search, noResultsHTML, shipProgressHTML, setMeta, petLabel, tel, wa, waOk, phoneText, ICON, url, BRANDS, initCarousel, inRange, fmtDate };
 
   renderChrome();
   document.querySelectorAll("[data-search]").forEach(initSearch);

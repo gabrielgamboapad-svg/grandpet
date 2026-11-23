@@ -42,14 +42,20 @@
   form.addEventListener("submit", (e) => e.preventDefault());
   render();
 
-  // ---------- marcas (textos de grandpet.com, foto del producto más vendido de cada una) ----------
-  const order = ["Natural Gourmet", "Carne Fresca", "Noble", "Back 2 Nature", "Magno", "Kisha"];
-  document.getElementById("brands").innerHTML = order.map((b) => {
-    const top = PRODUCTS.filter((p) => p.brand === b && p.images[0]).sort((x, y) => x.rank - y.rank)[0];
-    const im = top && top.images[0];
+  // ---------- marcas: logo de grandpet.com + texto de la marca, enlace a su página ----------
+  const MARCAS = window.MARCAS || [];
+  const order = ["natural-gourmet", "carne-fresca", "noble", "back-2-nature", "magno", "kisha"];
+  document.getElementById("brands").innerHTML = order.map((slug) => {
+    const m = MARCAS.find((x) => x.slug === slug);
+    const top = PRODUCTS.filter((p) => p.brand === m.store && p.images[0]).sort((x, y) => x.rank - y.rank)[0];
+    const media = m.logo ? `<img src="assets/img/${m.logo}.webp" alt="" width="320" height="320" loading="lazy" decoding="async">`
+      : top ? img(top.images[0].src, { widths: [240, 360], sizes: "(min-width:1024px) 180px, 40vw", w: top.images[0].w, h: top.images[0].h }) : "";
     return `<li class="brand-card">
-      <div class="brand-media">${im ? img(im.src, { widths: [240, 360], sizes: "(min-width:1024px) 180px, 40vw", w: im.w, h: im.h }) : ""}</div>
-      <div><h3>${esc(b)}®</h3><p>${esc(BRANDS[b])}</p>
-      <a class="link-quiet" href="coleccion.html?c=todo&amp;brand=${encodeURIComponent(b)}">Ver productos ${esc(b)} →</a></div></li>`;
+      <div class="brand-media${m.logo ? " is-logo" : ""}">${media}</div>
+      <div><h3><a href="marca.html?m=${m.slug}">${esc(m.name)}®</a></h3><p>${esc(BRANDS[m.store] || m.tagline)}</p>
+      <a class="link-quiet" href="marca.html?m=${m.slug}">Conoce ${esc(m.name)} →</a></div></li>`;
   }).join("");
+
+  // ---------- La Huella Dorada: solo mientras esté vigente ----------
+  if (!window.GP.inRange(window.GP.CFG.huella)) document.getElementById("huella-banner")?.remove();
 })();

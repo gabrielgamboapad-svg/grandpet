@@ -31,7 +31,7 @@
               <a class="btn btn-primary" href="coleccion.html?c=perro">Comprar para perro</a>
               <a class="btn btn-secondary" href="coleccion.html?c=gato">Comprar para gato</a>
             </div>
-            <p class="hero-more"><a class="link-quiet" href="#quienes-somos">Conoce GrandPET</a> · <span class="cert">Certificación FSSC 22000</span></p>
+            <p class="hero-more"><a class="link-quiet" href="nosotros.html">Conoce GrandPET</a> · <span class="cert">Certificación FSSC 22000</span></p>
           </div>
           <div class="hero-art" aria-hidden="true">
             <img src="https://cdn.shopify.com/s/files/1/0095/4223/8266/files/Carne_Fresca_Force_20_Kg_1_Kg_Gratis.jpg?v=1794587382&amp;width=600"
@@ -64,6 +64,20 @@
          paquetes, mas-vendidos, todo), data-limit (cantidad) y data-autoplay (segundos entre avances). -->
     <section class="section" data-carousel data-collection="mas-vendidos" data-title="Más vendidos" data-limit="10" data-autoplay="4" data-eager></section>
     <section class="section" data-carousel data-collection="perro" data-title="Para perro" data-limit="10" data-autoplay="5"></section>
+    <!-- La Huella Dorada: inicio.js lo quita fuera de vigencia (GP_CONFIG.huella) -->
+    <section class="section" id="huella-banner" aria-labelledby="huella-t">
+      <div class="wrap">
+        <a class="huella-band" href="promociones.html">
+          <img src="assets/img/huella-titulo.webp" alt="" width="694" height="376" loading="lazy" decoding="async">
+          <div>
+            <h2 id="huella-t">La Huella Dorada: ¡aquí todos ganan!</h2>
+            <p>Encuentra el código único en empaques participantes de Kisha o Noble y descubre al instante tu premio. Vigente al 9 de enero de 2027.</p>
+            <span class="btn btn-primary btn-small">Cómo participar</span>
+          </div>
+        </a>
+      </div>
+    </section>
+
     <section class="section" data-carousel data-collection="gato" data-title="Para gato" data-limit="10" data-autoplay="4"></section>
 
     <section class="section" aria-labelledby="marcas-t">
@@ -71,6 +85,7 @@
         <h2 id="marcas-t">Nuestras marcas</h2>
         <p class="section-sub">Elaboramos y comercializamos nuestras marcas de alimento cubriendo todas las etapas de tu mascota, priorizando su desarrollo y bienestar.</p>
         <ul class="brands" id="brands"></ul>
+        <p><a class="link-quiet" href="marcas.html">Ver todas las marcas →</a></p>
       </div>
     </section>
 
@@ -85,6 +100,7 @@
             <h2 id="qs-t">GrandPET®: el bienestar de tu mascota es nuestro compromiso</h2>
             <p>GrandPET® nace ante la importancia que han generado las mascotas en nuestras familias, constituyéndose como una de las empresas más importantes en la nutrición de las mascotas en nuestro país. Fundada en el estado de Guanajuato, somos una empresa familiar 100% mexicana.</p>
             <p><strong>Misión:</strong> mejorar la calidad de vida de las mascotas para crear felicidad.</p>
+            <p><a class="btn btn-secondary" href="nosotros.html">Conoce nuestra historia</a></p>
           </div>
           <ul class="about-points">
             <li><strong>Todas las etapas</strong><span>Alimentos que cubren todas las etapas de tu mascota, priorizando su desarrollo y bienestar.</span></li>
@@ -95,10 +111,20 @@
         </div>
       </div>
     </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="cta-band">
+          <div><h2>Únete a GrandPET</h2><p>¿Eres distribuidor, veterinario, forrajera o tienda? Escríbenos y uno de nuestros agentes te contactará.</p></div>
+          <a class="btn btn-primary" href="contacto.html#distribuidor">Quiero distribuir</a>
+        </div>
+      </div>
+    </section>
   </main>
 
   <div id="site-footer"></div>
   <script src="data/products.js" defer></script>
+  <script src="data/marcas.js" defer></script>
   <script src="assets/js/config.js" defer></script>
   <script src="assets/js/app.js" defer></script>
   <script src="assets/js/inicio.js" defer></script>

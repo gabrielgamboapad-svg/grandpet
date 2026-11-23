@@ -4,6 +4,15 @@ Sitio estático (HTML + CSS + JS sin librerías), todo dentro de la misma págin
 búsqueda, ficha de producto, carrito y políticas. El pedido se cierra por WhatsApp: el cliente llena
 sus datos de entrega en el carrito y se abre WhatsApp con el pedido completo. Sin registro ni cuentas.
 
+## Páginas
+- Tienda: `index.html` (portada), `coleccion.html`, `producto.html`, `carrito.html`.
+- Empresa (contenido de grandpet.com): `nosotros.html`, `marcas.html`, `marca.html?m=<marca>`,
+  `promociones.html` (La Huella Dorada, visible solo en su vigencia), `contacto.html` (incluye "Únete a GrandPET"),
+  `politicas.html`.
+- El contenido de cada marca está en `data/marcas.js`; las imágenes de grandpet.com se bajan y optimizan con
+  `python -X utf8 tools/fetch_images.py` a `assets/img/`.
+- El formulario de contacto abre el correo del visitante con el mensaje listo (no hay servidor).
+
 ## Ver en local
 ```
 python -m http.server 8080

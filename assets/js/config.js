@@ -7,11 +7,18 @@ window.GP_CONFIG = {
   // PHONE_PRINCIPAL, el botón de pedido queda desactivado.
   whatsapp: "PHONE_PRINCIPAL",
 
+  // Correo y dirección de contacto (de grandpet.com/contacto).
+  email: "atencionclientes@grandpet.com",
+  address: "Carretera La Piedad - Ciudad Manuel Doblado Km 1 s/n, Poblado, 35910 Santa Ana Pacueco, Guanajuato",
+
   // Envío gratis desde este monto (MXN), sujeto a cobertura.
   freeShipping: 999,
 
   // "Ofertas" es una sección temporal: el enlace del menú solo aparece entre estas fechas.
   ofertas: { start: "2026-11-01", end: "2026-12-31" },
+
+  // La Huella Dorada (grandpet.com/promos): la página y su enlace solo aparecen entre estas fechas.
+  huella: { start: "2026-11-09", end: "2027-01-09" },
 
   // Banners de promoción. Cada uno se muestra solo entre start y end (inclusive) y desaparece al vencer.
   // Ejemplo:

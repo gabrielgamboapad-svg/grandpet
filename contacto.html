@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Contacto | GrandPET®</title>
+  <meta name="description" content="Contacta a GrandPET®: compras de alimento, distribuidores, dudas nutrimentales, quejas y sugerencias. Santa Ana Pacueco, Guanajuato. Tel. (352) 144 0509.">
+  <meta property="og:title" content="Contacto | GrandPET®">
+  <meta property="og:description" content="Escríbenos o únete a GrandPET como distribuidor.">
+  <meta name="theme-color" content="#FFF8EF">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al contenido</a>
+  <div id="site-header"></div>
+  <main id="main" class="wrap">
+    <nav class="breadcrumbs" aria-label="Migas de pan"><a href="index.html">Inicio</a> › <span aria-current="page">Contacto</span></nav>
+    <header class="coll-head">
+      <h1>Contacto</h1>
+      <p>Otorgamos gran disposición a nuestros clientes buscando en todo momento superar sus expectativas. En todo lo que hacemos siempre buscamos mejorar la calidad de vida de tu mascota.</p>
+    </header>
+
+    <div class="contact-layout">
+      <ul class="contact-cards">
+        <li class="info-card"><h2>Ubicación</h2><p id="c-address"></p><a class="link-quiet" id="c-map" rel="noopener">Ver en Google Maps →</a></li>
+        <li class="info-card"><h2>Teléfono</h2><p><a data-phone href="#"></a></p></li>
+        <li class="info-card"><h2>Correo</h2><p><a id="c-email" href="#"></a></p></li>
+      </ul>
+
+      <form class="contact-form order-form" id="contact-form" novalidate>
+        <h2 id="distribuidor">Escríbenos</h2>
+        <p class="small-print">Llena el formulario y uno de nuestros agentes atenderá tu mensaje. Se abrirá tu aplicación de correo con el mensaje listo para enviar.</p>
+        <label for="f-tipo">¿En qué te ayudamos?</label>
+        <select id="f-tipo" name="tipo">
+          <option value="compras">Compras de alimento</option>
+          <option value="distribuidor">Quiero ser distribuidor (Únete a GrandPET)</option>
+          <option value="servicios">Interés en ofrecer servicios</option>
+          <option value="nutricion">Dudas nutrimentales</option>
+          <option value="quejas">Quejas y sugerencias</option>
+        </select>
+
+        <div class="form-2">
+          <div><label for="f-nombre">Nombre *</label><input id="f-nombre" name="nombre" required maxlength="60" autocomplete="given-name"></div>
+          <div><label for="f-apellidos">Apellidos</label><input id="f-apellidos" name="apellidos" maxlength="60" autocomplete="family-name"></div>
+        </div>
+        <div data-show="distribuidor servicios compras"><label for="f-empresa">Compañía</label><input id="f-empresa" name="empresa" maxlength="80" autocomplete="organization"></div>
+        <div class="form-2">
+          <div><label for="f-correo">Correo electrónico *</label><input id="f-correo" name="correo" type="email" required maxlength="80" autocomplete="email"></div>
+          <div><label for="f-tel">Teléfono *</label><input id="f-tel" name="telefono" type="tel" required inputmode="numeric" pattern="[0-9]{10}" maxlength="10" autocomplete="tel-national"></div>
+        </div>
+        <div><label for="f-cp">Código postal *</label><input id="f-cp" name="cp" required inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="postal-code"></div>
+
+        <fieldset data-show="distribuidor" class="form-group">
+          <legend>Marcas de interés (máximo 3)</legend>
+          <div class="check-grid">
+            <label class="check"><input type="checkbox" name="marca" value="Natural Gourmet"> Natural Gourmet</label>
+            <label class="check"><input type="checkbox" name="marca" value="Back to Nature"> Back to Nature</label>
+            <label class="check"><input type="checkbox" name="marca" value="Carne Fresca"> Carne Fresca</label>
+            <label class="check"><input type="checkbox" name="marca" value="Noble"> Noble</label>
+            <label class="check"><input type="checkbox" name="marca" value="Kisha"> Kisha</label>
+            <label class="check"><input type="checkbox" name="marca" value="Clásico"> Clásico</label>
+            <label class="check"><input type="checkbox" name="marca" value="Nutrescan"> Nutrescan</label>
+            <label class="check"><input type="checkbox" name="marca" value="Nutrescan Natural"> Nutrescan Natural</label>
+            <label class="check"><input type="checkbox" name="marca" value="Supercan"> Supercan</label>
+          </div>
+          <div class="form-2">
+            <div><label for="f-vol">Volumen mensual estimado (toneladas)</label><input id="f-vol" name="volumen" type="number" min="1" max="999" inputmode="numeric"></div>
+            <div><label for="f-cliente">Tipo de cliente</label>
+              <select id="f-cliente" name="cliente"><option value="">Elige una opción</option><option>Autoconsumo</option><option>Distribuidor</option><option>Veterinario</option><option>Forrajera</option><option>Autoservicio</option><option>Tienda menudeo</option><option>Tienda especializada</option><option>Abarrotera</option><option>Mayorista</option><option>Exportación</option><option>Clínica veterinaria</option></select></div>
+          </div>
+        </fieldset>
+
+        <fieldset data-show="nutricion" class="form-group">
+          <legend>Sobre tu mascota</legend>
+          <label for="f-etapa">Talla y etapa</label>
+          <select id="f-etapa" name="etapa"><option value="">Elige una opción</option><option>Cachorro raza pequeña</option><option>Cachorro raza mediana o grande</option><option>Adulto raza pequeña</option><option>Adulto raza mediana o grande</option><option>Senior (7 o más años)</option><option>Gato</option></select>
+          <label for="f-necesidad">Necesidad especial</label><input id="f-necesidad" name="necesidad" maxlength="120">
+        </fieldset>
+
+        <label for="f-msg">Mensaje *</label>
+        <textarea id="f-msg" name="mensaje" rows="4" required maxlength="1000"></textarea>
+        <p class="form-error" id="contact-error" role="alert" hidden></p>
+        <button class="btn btn-primary btn-block" type="submit">Enviar mensaje</button>
+        <small>Al enviar aceptas el <a href="politicas.html#privacidad">aviso de privacidad</a>.</small>
+      </form>
+    </div>
+  </main>
+  <div id="site-footer"></div>
+  <script src="data/products.js" defer></script>
+  <script src="assets/js/config.js" defer></script>
+  <script src="assets/js/app.js" defer></script>
+  <script src="assets/js/paginas.js" defer></script>
+</body>
+</html>
