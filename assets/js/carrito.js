@@ -1,4 +1,4 @@
-/* Carrito: progreso de envío gratis, cantidades y pedido por WhatsApp con los datos de entrega. Sin registro. */
+/* Carrito: progreso de envío gratis, cantidades y pedido con los datos de entrega. Comprar requiere sesión con Google. */
 window.GP_READY.then(function () {
   "use strict";
   const { cart, img, esc, money, priceHTML, shipProgressHTML, CFG, url, wa, tel } = window.GP;
@@ -46,8 +46,9 @@ window.GP_READY.then(function () {
       <aside class="summary" aria-label="Resumen y datos de entrega">
         <div class="summary-row"><span>Subtotal</span><span id="subtotal">${money(cart.total())}</span></div>
         <small>Te confirmamos por WhatsApp disponibilidad, costo de envío y forma de pago.</small>
-        <form id="order" class="order-form" novalidate>
-          <p class="login-hint" id="login-hint"><a href="cuenta.html">Inicia sesión con Google</a> para comprar más rápido y ver tus pedidos. No es obligatorio: puedes pedir como invitado.</p>
+        ${loginCard()}
+        <form id="order" class="order-form" novalidate${window.GP.account() ? "" : " hidden"}>
+          <p class="login-hint" id="login-hint">Comprando con tu cuenta de Google.</p>
           <h2>Datos de entrega</h2>
           ${FIELDS.map(([k, l, t, a]) => `<label for="f-${k}">${l}</label><input id="f-${k}" name="${k}" type="${t}" ${a} value="${esc(saved[k] || "")}">`).join("")}
           <label for="f-notas">Notas (opcional)</label><textarea id="f-notas" name="notas" rows="2" maxlength="300" placeholder="Referencias de la casa, horario…">${esc(saved.notas || "")}</textarea>
@@ -63,11 +64,21 @@ window.GP_READY.then(function () {
     sessionInfo();
   }
 
-  // Con sesión de Google: se quita la invitación a iniciar sesión y se llena el nombre si está vacío.
+  // Comprar requiere sesión con Google: sin ella se muestra esto en lugar del formulario.
+  function loginCard() {
+    return `<div class="login-hint login-required" id="login-required"${window.GP.account() ? " hidden" : ""}>
+      <p><strong>Inicia sesión para comprar.</strong> Usamos tu cuenta de Google para guardar tu pedido y que veas su estado en Mi cuenta.</p>
+      <a class="btn btn-primary btn-block" href="cuenta.html?next=carrito.html">Continuar con Google</a></div>`;
+  }
+
+  // Confirma la sesión real (el token guardado pudo vencer); llena el nombre si está vacío.
   let me = null;
   async function sessionInfo() {
     const auth = window.GP_AUTH && (await window.GP_AUTH.catch(() => null));
     me = auth ? await auth.user() : null;
+    const form = document.getElementById("order"), gate = document.getElementById("login-required");
+    if (form) form.hidden = !me;
+    if (gate) gate.hidden = !!me;
     if (!me) return;
     const hint = document.getElementById("login-hint");
     if (hint) hint.textContent = `Comprando como ${auth.name(me)}. Verás este pedido en Mi cuenta.`;
@@ -79,6 +90,7 @@ window.GP_READY.then(function () {
   async function saveOrder(ref, d) {
     const auth = window.GP_AUTH && (await window.GP_AUTH.catch(() => null));
     if (!auth) throw new Error("sin conexión con la base");
+    if (!me) throw new Error("sin sesión");
     const items = cart.items().map(({ qty, p, v }) => ({ handle: p.handle, title: p.title, variant: v.title === "Default Title" ? "" : v.title, qty, price: v.price }));
     const customer = { nombre: d.nombre, telefono: d.telefono, calle: d.calle, colonia: d.colonia, cp: d.cp, ciudad: d.ciudad, estado: d.estado, notas: d.notas || "", email: me ? me.email : "" };
     const { error } = await auth.sb.from("orders").insert({ ref, customer, items, subtotal: Math.round(cart.total() * 100) / 100, user_id: me ? me.id : null });

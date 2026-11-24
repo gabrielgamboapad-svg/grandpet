@@ -23,6 +23,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; } /* que ninguna regla de display gane a "hidden" */
 html { -webkit-text-size-adjust: 100%; scroll-padding-top: 150px; } /* header + buscador en móvil */
 @media (min-width: 1024px) { html { scroll-padding-top: 90px; } }
 body {
@@ -618,6 +619,15 @@ p { margin: 0 0 1em; }
 .ed-table input[type="number"] { width: 100%; min-height: 40px !important; margin: 0 !important; }
 .ed-table input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--verde); }
 .ed-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+
+/* Botón de iniciar sesión en el header (comprar requiere sesión) */
+.header-login { min-height: 40px; padding: 6px 12px; gap: 6px; white-space: nowrap; }
+.header-login svg { width: 20px; height: 20px; }
+.header-login .lbl-long { display: none; }
+@media (min-width: 700px) { .header-login .lbl-long { display: inline; } .header-login .lbl-short { display: none; } }
+.login-required { display: grid; gap: 10px; border: 2px solid var(--naranja); background: #FFF3E3; }
+.login-required[hidden] { display: none; }
+.login-required p { margin: 0; }
 
 /* ======================= Reseñas ======================= */
 .stars small { color: var(--cafe-suave); font-weight: 700; font-size: .8em; }

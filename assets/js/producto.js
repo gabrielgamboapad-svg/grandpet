@@ -59,7 +59,7 @@ window.GP_READY.then(function () {
         <ul class="ship-signals">
           <li>${ICON.gift}<span id="ship-note"></span></li>
           <li>${ICON.truck}<span>Entrega estimada de 1 a 5 días hábiles en toda la República; en zonas extendidas puede tardar más. <a href="politicas.html#envios">Envíos</a></span></li>
-          <li>${ICON.shield}<span>Cambios y devoluciones según nuestra <a href="politicas.html#devoluciones">política</a>. Sin registro: confirmas tu pedido por WhatsApp.</span></li>
+          <li>${ICON.shield}<span>Cambios y devoluciones según nuestra <a href="politicas.html#devoluciones">política</a>. Compra con tu cuenta de Google y sigue tu pedido en Mi cuenta.</span></li>
         </ul>
       </div>
     </div>
@@ -72,7 +72,7 @@ window.GP_READY.then(function () {
       <h2>Preguntas frecuentes</h2>
       <div class="accordion">
         <details><summary>¿Hacen envíos a todo México?</summary><div class="acc-body"><p>Hacemos envíos nacionales. El envío es gratis desde ${money(CFG.freeShipping)} MXN, sujeto a cobertura. Consulta la <a href="politicas.html#envios">política de envíos</a>.</p></div></details>
-        <details><summary>¿Cómo hago mi pedido?</summary><div class="acc-body"><p>Agrega tus productos al carrito, llena tus datos de entrega y envía el pedido por WhatsApp. Te confirmamos disponibilidad, costo de envío y forma de pago. No necesitas crear una cuenta.</p></div></details>
+        <details><summary>¿Cómo hago mi pedido?</summary><div class="acc-body"><p>Inicia sesión con tu cuenta de Google, agrega tus productos al carrito, llena tus datos de entrega y envía el pedido. Te confirmamos disponibilidad, costo de envío y forma de pago, y puedes seguir su estado en Mi cuenta.</p></div></details>
         <details><summary>¿Tienes dudas sobre qué alimento elegir?</summary><div class="acc-body"><p>${waOk ? `Escríbenos por <a href="${wa("Hola, tengo una duda sobre " + p.title)}">WhatsApp</a>` : `Llámanos al <a href="${tel}">${esc(phoneText)}</a>`} y te ayudamos a elegir según la edad y tamaño de tu mascota.</p></div></details>
       </div>
       <h2>Cambios y devoluciones</h2>

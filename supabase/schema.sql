@@ -52,10 +52,9 @@ create index orders_user_idx on public.orders (user_id);
 create index orders_created_idx on public.orders (created_at desc);
 
 alter table public.orders enable row level security;
--- ponytail: cualquiera puede crear un pedido (compra como invitado). Si llega spam, agregar captcha
--- o límite por IP con una Edge Function.
-create policy orders_insert on public.orders for insert to anon, authenticated
-  with check (status = 'nuevo' and admin_notes is null and (user_id is null or user_id = auth.uid()));
+-- Comprar requiere sesión con Google: solo usuarios autenticados, y el pedido queda a su nombre.
+create policy orders_insert on public.orders for insert to authenticated
+  with check (status = 'nuevo' and admin_notes is null and user_id = (select auth.uid()));
 create policy orders_select on public.orders for select to authenticated
   using (user_id = (select auth.uid()) or public.is_admin());
 create policy orders_update on public.orders for update to authenticated

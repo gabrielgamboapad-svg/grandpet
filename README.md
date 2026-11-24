@@ -2,7 +2,7 @@
 
 Sitio estático (HTML + CSS + JS sin librerías), todo dentro de la misma página: catálogo, filtros,
 búsqueda, ficha de producto, carrito y políticas. El pedido se cierra por WhatsApp: el cliente llena
-sus datos de entrega en el carrito y se abre WhatsApp con el pedido completo. Sin registro ni cuentas.
+sus datos de entrega en el carrito y se abre WhatsApp con el pedido completo. Para comprar hay que iniciar sesión con Google.
 
 ## Páginas
 - Tienda: `index.html` (portada), `coleccion.html`, `producto.html`, `carrito.html`.
@@ -37,7 +37,7 @@ En `index.html`, cada `<section data-carousel>` se configura con `data-title`, `
 ## Cuentas, pedidos y panel de admin (Supabase)
 - Proyecto Supabase `grandpet` (`czgegrwqvjoiyuvclphh`). Esquema y reglas de seguridad en `supabase/schema.sql`.
 - `cuenta.html`: inicio de sesión con Google y "Mis pedidos". `admin.html`: pedidos, productos, promociones y administradores.
-- Cada pedido del carrito se guarda en `orders` (con o sin sesión). Sin WhatsApp configurado, la tienda llama para confirmar.
+- Cada pedido del carrito se guarda en `orders`; comprar requiere sesión con Google (la base lo exige). Sin WhatsApp configurado, la tienda llama para confirmar.
 - Lo que el admin edita (precios, disponibilidad, textos, promociones y fechas) se aplica sobre `data/products.js` al cargar cada página.
 - La clave de `config.js` es la *publishable* (pública por diseño). La protección real son las reglas RLS y `is_admin()`.
 

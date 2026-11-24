@@ -222,10 +222,28 @@ async function loadRemote() {
     toastTimer = setTimeout(() => (el.hidden = true), 6000);
     el.onmouseenter = el.onfocusin = () => clearTimeout(toastTimer);
   }
+  // Comprar requiere sesión: sin sesión se guarda el producto pendiente y se pide iniciar sesión;
+  // al volver (ya con sesión) se agrega solo. La base de datos también rechaza pedidos sin sesión.
+  const PENDING = "gp_pending_add";
+  const here = () => location.pathname.split("/").pop() + location.search;
+  const loginUrl = () => `cuenta.html?next=${encodeURIComponent(here() || "index.html")}`;
+  function askLogin(id, qty) {
+    try { sessionStorage.setItem(PENDING, JSON.stringify({ id: Number(id), qty, from: here() })); } catch {}
+    let el = document.getElementById("toast");
+    if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "status"); document.body.append(el); }
+    el.innerHTML = `<div class="toast-row"><p>Inicia sesión con tu cuenta de Google para comprar. Te regresamos aquí y agregamos el producto a tu carrito.</p>
+      <button class="icon-btn toast-close" type="button" aria-label="Cerrar aviso">✕</button></div>
+      <a class="btn btn-primary btn-small btn-block" href="${loginUrl()}">Continuar con Google</a>`;
+    el.hidden = false;
+    el.querySelector(".toast-close").onclick = () => (el.hidden = true);
+    clearTimeout(toastTimer);
+    el.querySelector("a").focus();
+  }
   document.addEventListener("click", (e) => {
     const b = e.target.closest("[data-add]");
     if (!b || b.disabled) return;
     const qty = Number(b.dataset.qty || 1);
+    if (!account()) return askLogin(b.dataset.add, qty);
     cart.add(b.dataset.add, qty);
     toast(Number(b.dataset.add), qty);
   });
@@ -287,7 +305,9 @@ async function loadRemote() {
           <nav class="main-nav" id="main-nav" aria-label="Principal"><ul>${navItems}</ul></nav>
           <div class="header-search">${searchHTML("q-desk")}</div>
           <div class="header-actions">
-            <a class="icon-btn" href="cuenta.html" aria-label="${account() ? "Mi cuenta" : "Iniciar sesión"}">${ICON.user}<span class="account-label">${esc(account() || "Iniciar sesión")}</span></a>
+            ${account()
+              ? `<a class="icon-btn" href="cuenta.html" aria-label="Mi cuenta">${ICON.user}<span class="account-label">${esc(account())}</span></a>`
+              : `<a class="btn btn-secondary btn-small header-login" href="${loginUrl()}">${ICON.user}<span class="lbl-long">Iniciar sesión</span><span class="lbl-short">Entrar</span></a>`}
             <a class="icon-btn" href="carrito.html" data-cart-link aria-label="Carrito">${ICON.cart}<span class="cart-count" hidden>0</span></a>
           </div>
         </div>
@@ -497,11 +517,20 @@ async function loadRemote() {
     if (ogd) ogd.content = desc;
   }
 
-  window.GP = { CFG, PRODUCTS, BY_HANDLE, COLLECTIONS, collection, cart, cardHTML, priceHTML, tagsHTML, img, money, esc, norm, search, noResultsHTML, shipProgressHTML, setMeta, petLabel, tel, wa, waOk, phoneText, ICON, url, BRANDS, initCarousel, inRange, fmtDate, starsHTML, loadAuth, account };
+  window.GP = { CFG, PRODUCTS, BY_HANDLE, COLLECTIONS, collection, cart, cardHTML, priceHTML, tagsHTML, img, money, esc, norm, search, noResultsHTML, shipProgressHTML, setMeta, petLabel, tel, wa, waOk, phoneText, ICON, url, BRANDS, initCarousel, inRange, fmtDate, starsHTML, loadAuth, account, loginUrl };
 
   renderChrome();
   document.querySelectorAll("[data-search]").forEach(initSearch);
   document.querySelectorAll("[data-carousel]").forEach((s) => initCarousel(s));
   addEventListener("storage", (e) => { if (e.key === KEY) { updateCount(); document.dispatchEvent(new CustomEvent("cart:change")); } });
+  // Producto que se quiso agregar antes de iniciar sesión: se agrega al volver.
+  try {
+    const pend = JSON.parse(sessionStorage.getItem(PENDING) || "null");
+    if (pend && account() && BY_VARIANT[pend.id]) {
+      sessionStorage.removeItem(PENDING);
+      cart.add(pend.id, pend.qty || 1);
+      toast(pend.id, pend.qty || 1);
+    }
+  } catch {}
   gpReady(window.GP);
 })();

@@ -18,7 +18,7 @@ window.GP_AUTH.then(async (auth) => {
       <h1>Mi cuenta</h1>
       <p>Inicia sesión con tu cuenta de Google para ver tus pedidos y llenar tus datos más rápido.</p>
       <button class="btn btn-google btn-block" type="button" id="login">${google} Continuar con Google</button>
-      <p class="small-print">No necesitas una cuenta para comprar: también puedes pedir como invitado desde el <a href="carrito.html">carrito</a>.</p>
+      <p class="small-print">Para comprar necesitas iniciar sesión. Solo usamos tu nombre y correo de Google; nunca recibimos tu contraseña.</p>
       <p class="form-error" id="login-error" role="alert" hidden></p>
     </section>`;
     document.getElementById("login").onclick = async () => {
