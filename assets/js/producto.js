@@ -200,7 +200,7 @@ window.GP_READY.then(function () {
   sec.id = "relacionados";
   sec.dataset.title = "También te puede interesar";
   sec.dataset.limit = "10";
-  sec.dataset.autoplay = "6";
+  sec.dataset.autoplay = "3";
   document.getElementById("main").after(sec);
   initCarousel(sec, related);
 });

@@ -620,6 +620,15 @@ p { margin: 0 0 1em; }
 .ed-table input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--verde); }
 .ed-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 
+/* Menú en una sola línea; en pantallas medianas el buscador baja a su propia fila */
+.main-nav a { white-space: nowrap; }
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .main-nav a { padding: 0 8px; font-size: .92rem; }
+  .header-search { display: none; }
+  .search-row { display: block; }
+  .header-actions { margin-left: auto; }
+}
+
 /* Botón de iniciar sesión en el header (comprar requiere sesión) */
 .header-login { min-height: 40px; padding: 6px 12px; gap: 6px; white-space: nowrap; }
 .header-login svg { width: 20px; height: 20px; }

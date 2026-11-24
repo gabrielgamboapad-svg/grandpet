@@ -290,9 +290,11 @@ async function loadRemote() {
     const page = location.pathname.split("/").pop() || "index.html";
     const cur = (href) => (href === page ? ' aria-current="page"' : "");
     const corp = CORP().map(([href, t]) => `<li class="nav-corp"><a href="${href}"${cur(href)}>${t}</a></li>`).join("");
-    const navItems = NAV.map(([k, t]) => `<li><a href="coleccion.html?c=${k}"${currentC === k ? ' aria-current="page"' : ""}>${t}</a></li>`).join("")
+    const navItems = `<li><a href="index.html"${page === "index.html" ? ' aria-current="page"' : ""}>Inicio</a></li>`
+      + NAV.map(([k, t]) => `<li><a href="coleccion.html?c=${k}"${currentC === k ? ' aria-current="page"' : ""}>${t}</a></li>`).join("")
       + (ofertas ? `<li class="nav-ofertas"><a href="coleccion.html?c=ofertas"${currentC === "ofertas" ? ' aria-current="page"' : ""}>Ofertas</a></li>` : "")
-      + `<li class="nav-sep" role="separator"></li>${corp}`;
+      + `<li class="nav-sep" role="separator"></li>${corp}`
+      + `<li class="nav-corp"><a href="${account() ? "cuenta.html" : loginUrl()}"${page === "cuenta.html" ? ' aria-current="page"' : ""}>${account() ? `Mi cuenta (${esc(account())})` : "Iniciar sesión"}</a></li>`;
     const h = document.getElementById("site-header");
     if (h) {
       h.outerHTML = `${promoHTML}<div class="topbar"><div class="wrap">
@@ -501,7 +503,7 @@ async function loadRemote() {
       setInterval(() => {
         if (hold || stopped || !visible || document.hidden) return;
         if (atEnd()) track.scrollTo({ left: 0 }); else track.scrollBy({ left: step() });
-      }, Math.max(5, secs) * 1000); // nunca más rápido que cada 5 s
+      }, Math.max(2, secs) * 1000); // nunca más rápido que cada 2 s
     }
   }
 

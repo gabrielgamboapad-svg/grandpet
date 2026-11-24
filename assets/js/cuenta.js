@@ -11,6 +11,8 @@ window.GP_AUTH.then(async (auth) => {
   // Después de iniciar sesión, regresar a donde estaba (p. ej. la ficha para escribir una reseña).
   const next = new URLSearchParams(location.search).get("next");
   if (user && next && /^[\w.-]+\.html(\?[^#]*)?(#[\w-]*)?$/.test(next)) { location.replace(next); return; }
+  // Recién llegado de Google sin destino: entrar a Inicio.
+  if (user && location.search.includes("code=")) { location.replace("index.html"); return; }
   if (location.search.includes("code=")) history.replaceState(null, "", location.pathname + (next ? "?next=" + encodeURIComponent(next) : ""));
 
   if (!user) {
