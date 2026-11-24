@@ -25,14 +25,14 @@
   <script src="assets/js/config.js" defer></script>
   <script src="assets/js/app.js" defer></script>
   <script>
-    // Los scripts con defer ya corrieron al llegar DOMContentLoaded.
-    addEventListener("DOMContentLoaded", () => {
+    // Los scripts con defer (app.js) ya corrieron al llegar DOMContentLoaded; luego se espera a GP_READY.
+    addEventListener("DOMContentLoaded", () => window.GP_READY.then(() => {
       const { esc } = window.GP;
       // p.html viene sanitizado por tools/build_data.py
       document.querySelector("nav.chips").innerHTML = POLICIES.map((p) => `<a class="chip" href="#${p.key}">${esc(p.title)}</a>`).join("");
       document.getElementById("policies").innerHTML = POLICIES.map((p) => `<section class="policy" id="${p.key}"><h2>${esc(p.title)}</h2>${p.html}</section>`).join("");
       if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
-    });
+    }));
   </script>
 </body>
 </html>

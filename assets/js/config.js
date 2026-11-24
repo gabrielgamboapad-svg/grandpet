@@ -1,5 +1,12 @@
 // Ajustes del sitio. Este es el ÚNICO lugar donde se cambian teléfono, envío y promociones.
 window.GP_CONFIG = {
+  // Supabase (cuentas con Google, pedidos y panel de admin). La clave "publishable" está hecha para el
+  // navegador: la seguridad la ponen las reglas (RLS) de la base, ver supabase/schema.sql.
+  supabase: {
+    url: "https://czgegrwqvjoiyuvclphh.supabase.co",
+    key: "sb_publishable_wFzIgKpz519ceuPbEPZQkA_p7_2RC6I",
+  },
+
   // Teléfono para llamadas (enlaces tel:), 10 dígitos. Es el que publica grandpet.com.
   phone: "3521440509",
 

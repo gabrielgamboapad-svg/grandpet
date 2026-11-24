@@ -1,5 +1,5 @@
 /* Páginas de la empresa: marcas, detalle de marca, La Huella Dorada y contacto. */
-(function () {
+window.GP_READY.then(function () {
   "use strict";
   const GP = window.GP;
   const { esc, img, money, BY_HANDLE, PRODUCTS, CFG, setMeta, initCarousel, url } = GP;
@@ -121,4 +121,4 @@
       if (!form.querySelector(".form-ok")) form.insertAdjacentHTML("beforeend", `<p class="form-ok" role="status">Abrimos tu aplicación de correo con el mensaje listo. Si no se abrió, escríbenos a <a href="mailto:${CFG.email}">${esc(CFG.email)}</a>.</p>`);
     });
   }
-})();
+});

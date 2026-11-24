@@ -1,5 +1,5 @@
 /* Colección / resultados de búsqueda con filtros. Estado en la URL para poder compartir el enlace. */
-(function () {
+window.GP_READY.then(function () {
   "use strict";
   const { COLLECTIONS, collection, cardHTML, search, noResultsHTML, setMeta, esc, petLabel } = window.GP;
   const params = new URLSearchParams(location.search);
@@ -113,4 +113,4 @@
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && panel.classList.contains("open")) setOpen(false); });
 
   apply();
-})();
+});

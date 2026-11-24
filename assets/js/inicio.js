@@ -1,5 +1,5 @@
 /* Portada: selector guiado (mascota → etapa → formato) y tarjetas de marcas. */
-(function () {
+window.GP_READY.then(function () {
   "use strict";
   const { PRODUCTS, BRANDS, img, esc } = window.GP;
 
@@ -74,4 +74,4 @@
 
   // ---------- La Huella Dorada: solo mientras esté vigente ----------
   if (!window.GP.inRange(window.GP.CFG.huella)) document.getElementById("huella-banner")?.remove();
-})();
+});

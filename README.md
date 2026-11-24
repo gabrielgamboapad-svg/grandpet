@@ -34,5 +34,23 @@ En `index.html`, cada `<section data-carousel>` se configura con `data-title`, `
 (`perro`, `gato`, `premios`, `humedo`, `accesorios`, `ofertas`, `cachorros`, `gatitos`, `paquetes`,
 `mas-vendidos`, `todo`), `data-limit` y `data-autoplay` (segundos entre avances; se pausa con mouse, foco, toque o el botón ❚❚).
 
+## Cuentas, pedidos y panel de admin (Supabase)
+- Proyecto Supabase `grandpet` (`czgegrwqvjoiyuvclphh`). Esquema y reglas de seguridad en `supabase/schema.sql`.
+- `cuenta.html`: inicio de sesión con Google y "Mis pedidos". `admin.html`: pedidos, productos, promociones y administradores.
+- Cada pedido del carrito se guarda en `orders` (con o sin sesión). Sin WhatsApp configurado, la tienda llama para confirmar.
+- Lo que el admin edita (precios, disponibilidad, textos, promociones y fechas) se aplica sobre `data/products.js` al cargar cada página.
+- La clave de `config.js` es la *publishable* (pública por diseño). La protección real son las reglas RLS y `is_admin()`.
+
+### Activar el inicio de sesión con Google (una sola vez)
+1. Google Cloud Console → APIs y servicios → Pantalla de consentimiento de OAuth (Externo) y luego Credenciales →
+   Crear ID de cliente OAuth (Aplicación web).
+   - Orígenes autorizados: `https://gabrielgamboapad-svg.github.io` y `http://localhost:8080`
+   - URI de redirección autorizada: `https://czgegrwqvjoiyuvclphh.supabase.co/auth/v1/callback`
+2. Supabase → Authentication → Sign In / Providers → Google: activarlo y pegar el Client ID y el Client Secret
+   (el secreto solo va en Supabase, nunca en este repo).
+3. Supabase → Authentication → URL Configuration:
+   - Site URL: `https://gabrielgamboapad-svg.github.io/grandpet/`
+   - Redirect URLs: `https://gabrielgamboapad-svg.github.io/grandpet/**` y `http://localhost:8080/**`
+
 ## Publicación
 GitHub Pages publica la rama `main` automáticamente.

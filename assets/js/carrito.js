@@ -1,5 +1,5 @@
 /* Carrito: progreso de envío gratis, cantidades y pedido por WhatsApp con los datos de entrega. Sin registro. */
-(function () {
+window.GP_READY.then(function () {
   "use strict";
   const { cart, img, esc, money, priceHTML, shipProgressHTML, CFG, url, wa, tel } = window.GP;
   const root = document.getElementById("cart");
@@ -47,22 +47,46 @@
         <div class="summary-row"><span>Subtotal</span><span id="subtotal">${money(cart.total())}</span></div>
         <small>Te confirmamos por WhatsApp disponibilidad, costo de envío y forma de pago.</small>
         <form id="order" class="order-form" novalidate>
+          <p class="login-hint" id="login-hint"><a href="cuenta.html">Inicia sesión con Google</a> para comprar más rápido y ver tus pedidos. No es obligatorio: puedes pedir como invitado.</p>
           <h2>Datos de entrega</h2>
           ${FIELDS.map(([k, l, t, a]) => `<label for="f-${k}">${l}</label><input id="f-${k}" name="${k}" type="${t}" ${a} value="${esc(saved[k] || "")}">`).join("")}
           <label for="f-notas">Notas (opcional)</label><textarea id="f-notas" name="notas" rows="2" maxlength="300" placeholder="Referencias de la casa, horario…">${esc(saved.notas || "")}</textarea>
           <label class="check"><input type="checkbox" name="recordar"${saved.nombre ? " checked" : ""}> Recordar mis datos en este dispositivo para comprar más rápido</label>
           <p class="form-error" id="form-error" role="alert" hidden></p>
-          <button class="btn btn-primary btn-block" type="submit"${phoneOk ? "" : " disabled"}>Enviar pedido por WhatsApp</button>
-          ${phoneOk ? "" : `<p class="form-error">Los pedidos por WhatsApp se activan cuando se configure el WhatsApp de la tienda. Mientras, llámanos al <a href="${tel}">${esc(window.GP.phoneText)}</a>.</p>`}
-          <small>No necesitas crear una cuenta. Al enviar aceptas el <a href="politicas.html#privacidad">aviso de privacidad</a>.</small>
+          <button class="btn btn-primary btn-block" type="submit">${phoneOk ? "Enviar pedido por WhatsApp" : "Enviar pedido"}</button>
+          <small>${phoneOk ? "Se abrirá WhatsApp con tu pedido listo." : `Te llamaremos para confirmar tu pedido. ¿Dudas? <a href="${tel}">${esc(window.GP.phoneText)}</a>.`} Al enviar aceptas el <a href="politicas.html#privacidad">aviso de privacidad</a>.</small>
         </form>
         <small>¿Dudas? <a href="${tel}">Llámanos</a>.</small>
       </aside>
     </div>`;
     document.getElementById("order").addEventListener("submit", submit);
+    sessionInfo();
   }
 
-  function submit(e) {
+  // Con sesión de Google: se quita la invitación a iniciar sesión y se llena el nombre si está vacío.
+  let me = null;
+  async function sessionInfo() {
+    const auth = window.GP_AUTH && (await window.GP_AUTH.catch(() => null));
+    me = auth ? await auth.user() : null;
+    if (!me) return;
+    const hint = document.getElementById("login-hint");
+    if (hint) hint.textContent = `Comprando como ${auth.name(me)}. Verás este pedido en Mi cuenta.`;
+    const n = document.getElementById("f-nombre");
+    if (n && !n.value) n.value = auth.name(me);
+  }
+
+  // Guarda el pedido en Supabase (lo ve el admin y, con sesión, el cliente en Mi cuenta).
+  async function saveOrder(ref, d) {
+    const auth = window.GP_AUTH && (await window.GP_AUTH.catch(() => null));
+    if (!auth) throw new Error("sin conexión con la base");
+    const items = cart.items().map(({ qty, p, v }) => ({ handle: p.handle, title: p.title, variant: v.title === "Default Title" ? "" : v.title, qty, price: v.price }));
+    const customer = { nombre: d.nombre, telefono: d.telefono, calle: d.calle, colonia: d.colonia, cp: d.cp, ciudad: d.ciudad, estado: d.estado, notas: d.notas || "", email: me ? me.email : "" };
+    const { error } = await auth.sb.from("orders").insert({ ref, customer, items, subtotal: Math.round(cart.total() * 100) / 100, user_id: me ? me.id : null });
+    if (error) throw error;
+  }
+  const newRef = () => [...crypto.getRandomValues(new Uint8Array(4))].map((b) => b.toString(16).padStart(2, "0")).join("").toUpperCase();
+
+  async function submit(e) {
     e.preventDefault();
     const form = e.target;
     const err = document.getElementById("form-error");
@@ -80,10 +104,34 @@
       else localStorage.removeItem(KEY);
     } catch {}
 
+    const ref = newRef();
+    const btn = form.querySelector('button[type="submit"]');
+
+    // Sin WhatsApp configurado: el pedido queda guardado y la tienda llama para confirmarlo.
+    if (!phoneOk) {
+      btn.disabled = true;
+      btn.textContent = "Enviando…";
+      try {
+        await saveOrder(ref, d);
+      } catch (x) {
+        btn.disabled = false;
+        btn.textContent = "Enviar pedido";
+        err.textContent = "No pudimos enviar tu pedido. Revisa tu conexión e intenta de nuevo, o llámanos.";
+        err.hidden = false;
+        return;
+      }
+      cart.clear();
+      root.innerHTML = `<div class="empty" role="status"><h2>¡Recibimos tu pedido #${ref}!</h2>
+        <p>Te llamaremos al ${esc(d.telefono)} para confirmar disponibilidad, costo de envío y forma de pago.</p>
+        ${me ? `<a class="btn btn-secondary" href="cuenta.html">Ver mis pedidos</a>` : ""} <a class="btn btn-primary" href="index.html">Seguir comprando</a></div>`;
+      return;
+    }
+
     const total = cart.total();
     const lines = cart.items().map(({ qty, p, v }) => `• ${qty} × ${p.title}${v.title !== "Default Title" ? ` (${v.title})` : ""} — ${money(v.price * qty)}`);
+    const saving = saveOrder(ref, d); // se guarda mientras se abre WhatsApp
     const msg = [
-      "Hola GrandPET, quiero hacer este pedido:", "", ...lines, "",
+      `Hola GrandPET, quiero hacer este pedido (#${ref}):`, "", ...lines, "",
       `Subtotal: ${money(total)}`,
       total >= CFG.freeShipping ? "Envío: gratis (sujeto a cobertura)" : "Envío: por confirmar",
       "", "Datos de entrega:",
@@ -94,7 +142,8 @@
     const link = wa(msg);
     window.open(link, "_blank", "noopener");
 
-    root.innerHTML = `<div class="empty" role="status"><h2>¡Listo! Abrimos WhatsApp con tu pedido</h2>
+    saving.catch(() => {}); // si falla, el pedido igual va completo en el mensaje de WhatsApp
+    root.innerHTML = `<div class="empty" role="status"><h2>¡Listo! Abrimos WhatsApp con tu pedido #${ref}</h2>
       <p>Solo falta que presiones <strong>Enviar</strong> en WhatsApp. Te responderemos para confirmar envío y forma de pago.</p>
       <div class="hero-ctas" style="justify-content:center">
         <a class="btn btn-secondary" href="${esc(link)}" target="_blank" rel="noopener">Abrir WhatsApp de nuevo</a>
@@ -119,4 +168,4 @@
     document.getElementById("subtotal").textContent = money(cart.total());
   });
   mount();
-})();
+});

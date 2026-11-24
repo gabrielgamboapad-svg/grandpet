@@ -1,5 +1,5 @@
 /* Ficha de producto. Orden: nombre+mascota+etapa → galería → tamaño → beneficios → precio → compra+envío → acordeones. */
-(function () {
+window.GP_READY.then(function () {
   "use strict";
   const { BY_HANDLE, COLLECTIONS, PRODUCTS, BRANDS, priceHTML, tagsHTML, img, esc, money, setMeta, wa, waOk, tel, phoneText, ICON, CFG, petLabel, initCarousel } = window.GP;
   const params = new URLSearchParams(location.search);
@@ -143,4 +143,4 @@
   sec.dataset.autoplay = "6";
   document.getElementById("main").after(sec);
   initCarousel(sec, related);
-})();
+});

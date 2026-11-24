@@ -1,6 +1,50 @@
 /* GrandPET — JS compartido: header/footer, promos, carrito, tarjetas, carrusel y búsqueda. Sin librerías. */
-(function () {
+
+// Las demás páginas esperan a esta promesa (window.GP_READY.then(...)) para usar window.GP.
+let gpReady;
+window.GP_READY = new Promise((r) => (gpReady = r));
+
+// Lo que edita el admin en Supabase (precios, disponibilidad, textos, promociones y fechas) se aplica
+// antes de pintar. Si la base no responde en 2.5 s, la página sigue con los datos locales.
+async function loadRemote() {
+  const S = window.GP_CONFIG.supabase;
+  if (!S) return;
+  const get = (path) => fetch(`${S.url}/rest/v1/${path}`, { headers: { apikey: S.key } }).then((r) => (r.ok ? r.json() : []));
+  // Copia sin ediciones (para "Restablecer" en el panel) y lista completa incluyendo ocultos.
+  window.PRODUCTS_BASE = JSON.parse(JSON.stringify(window.PRODUCTS || []));
+  window.PRODUCTS_ALL = window.PRODUCTS || [];
+  try {
+    const [edits, promos, settings] = await Promise.race([
+      Promise.all([get("product_edits?select=handle,data"), get("promos?select=text,code,link,start_date,end_date"), get("settings?select=key,value")]),
+      new Promise((_, no) => setTimeout(() => no(new Error("tiempo agotado")), 2500)),
+    ]);
+    const by = Object.fromEntries((window.PRODUCTS || []).map((p) => [p.handle, p]));
+    edits.forEach(({ handle, data }) => {
+      const p = by[handle];
+      if (!p || !data) return;
+      if (typeof data.short === "string" && data.short.trim()) p.short = data.short.trim();
+      if (Array.isArray(data.benefits)) p.benefits = data.benefits.filter((b) => typeof b === "string" && b.trim());
+      if (data.hidden === true) p.hidden = true;
+      p.variants.forEach((v) => {
+        const e = data.variants && data.variants[v.id];
+        if (!e) return;
+        if (typeof e.price === "number" && e.price >= 0) v.price = e.price;
+        if (e.compare === null || typeof e.compare === "number") v.compare = e.compare;
+        if (typeof e.available === "boolean") v.available = e.available;
+      });
+    });
+    window.PRODUCTS = (window.PRODUCTS || []).filter((p) => !p.hidden);
+    const C = window.GP_CONFIG;
+    C.promos = [...(C.promos || []), ...promos.map((x) => ({ text: x.text, code: x.code, link: x.link, start: x.start_date, end: x.end_date }))];
+    settings.forEach((x) => { if (x.value && x.value.start && x.value.end) C[x.key] = x.value; });
+  } catch (e) {
+    console.warn("GrandPET: sin datos de Supabase, uso los locales.", e.message);
+  }
+}
+
+(async function () {
   "use strict";
+  await loadRemote();
   const CFG = window.GP_CONFIG;
   const PRODUCTS = window.PRODUCTS || [];
   const BY_HANDLE = Object.fromEntries(PRODUCTS.map((p) => [p.handle, p]));
@@ -175,6 +219,16 @@
     shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 4 6v6c0 4.5 3.4 8 8 9 4.6-1 8-4.5 8-9V6z"/><path d="m9 12 2 2 4-4" stroke-linecap="round"/></svg>',
     wa: '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.4.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.2 5.2 0 0 0 1.1 2.7 11.8 11.8 0 0 0 4.5 4c1.7.7 2.3.8 3.2.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.2-.2-.4-.3Z"/></svg>',
   };
+  // Nombre de quien inició sesión (lo guarda supabase-js en localStorage); "" si no hay sesión.
+  function account() {
+    try {
+      const ref = new URL(CFG.supabase.url).hostname.split(".")[0];
+      const s = JSON.parse(localStorage.getItem(`sb-${ref}-auth-token`) || "null");
+      const u = s && s.user;
+      if (!u || (s.expires_at && s.expires_at * 1000 < Date.now() - 7 * 864e5)) return "";
+      return (u.user_metadata && (u.user_metadata.full_name || u.user_metadata.name) || u.email || "Mi cuenta").split(" ")[0];
+    } catch { return ""; }
+  }
   const NAV = [["perro", "Perro"], ["gato", "Gato"], ["premios", "Premios"], ["humedo", "Alimento húmedo"], ["accesorios", "Accesorios"]];
   // Páginas de la empresa (contenido de grandpet.com). La Huella Dorada solo aparece mientras esté vigente.
   const CORP = () => [["nosotros.html", "Nosotros"], ["marcas.html", "Marcas"],
@@ -211,6 +265,7 @@
           <nav class="main-nav" id="main-nav" aria-label="Principal"><ul>${navItems}</ul></nav>
           <div class="header-search">${searchHTML("q-desk")}</div>
           <div class="header-actions">
+            <a class="icon-btn" href="cuenta.html" aria-label="${account() ? "Mi cuenta" : "Iniciar sesión"}">${ICON.user}<span class="account-label">${esc(account() || "Iniciar sesión")}</span></a>
             <a class="icon-btn" href="carrito.html" data-cart-link aria-label="Carrito">${ICON.cart}<span class="cart-count" hidden>0</span></a>
           </div>
         </div>
@@ -425,4 +480,5 @@
   document.querySelectorAll("[data-search]").forEach(initSearch);
   document.querySelectorAll("[data-carousel]").forEach((s) => initCarousel(s));
   addEventListener("storage", (e) => { if (e.key === KEY) { updateCount(); document.dispatchEvent(new CustomEvent("cart:change")); } });
+  gpReady(window.GP);
 })();
