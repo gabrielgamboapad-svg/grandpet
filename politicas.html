@@ -16,7 +16,36 @@
   <div id="site-header"></div>
   <main id="main" class="wrap">
     <h1 style="margin-top:20px">Políticas</h1>
-    <nav aria-label="Políticas" class="chips" style="padding:0 0 16px"></nav>
+    <nav aria-label="Políticas" class="chips" style="padding:0 0 16px"><a class="chip" href="#compras-sitio">Cómo comprar en este sitio</a><a class="chip" href="#privacidad-sitio">Privacidad en este sitio</a></nav>
+
+    <!-- Secciones propias de este sitio (pedido por WhatsApp/teléfono, cuentas con Google, base de datos).
+         Pendiente: revisión del área legal de GrandPET antes de considerarlas definitivas. -->
+    <section class="policy" id="compras-sitio">
+      <h2>Cómo comprar en este sitio</h2>
+      <ol>
+        <li>Agrega tus productos al carrito. Los precios están en pesos mexicanos (MXN).</li>
+        <li>Llena tus datos de entrega y envía tu pedido. Recibirás un número de pedido.</li>
+        <li>Te contactamos por WhatsApp o por teléfono para confirmar disponibilidad, costo de envío y forma de pago. <strong>En este sitio no se cobra ni se piden datos de tarjeta.</strong></li>
+        <li>Enviamos a toda la República Mexicana. El envío es gratis en pedidos desde $999 MXN, salvo zonas extendidas, de difícil acceso o con reexpedición. La entrega estimada es de 1 a 5 días hábiles; en zonas extendidas puede tardar más.</li>
+      </ol>
+      <p>Puedes comprar como invitado o iniciar sesión con tu cuenta de Google para ver el historial y el estado de tus pedidos en <a href="cuenta.html">Mi cuenta</a>. Para cambios y devoluciones aplica la <a href="#devoluciones">política de devoluciones</a>.</p>
+    </section>
+
+    <section class="policy" id="privacidad-sitio">
+      <h2>Privacidad en este sitio</h2>
+      <p><strong>Responsable:</strong> GrandPET®, operado por Multiservicios 2001 S.A. de C.V., Carretera La Piedad - Ciudad Manuel Doblado Km 1 s/n, 35910 Santa Ana Pacueco, Guanajuato.</p>
+      <p><strong>Datos que recabamos:</strong></p>
+      <ul>
+        <li>Al hacer un pedido: nombre, teléfono, dirección de entrega, notas y los productos del pedido.</li>
+        <li>Si inicias sesión con Google: tu nombre, correo y foto de perfil que Google comparte con nosotros. No recibimos tu contraseña.</li>
+        <li>Si escribes una reseña: tu calificación y comentario, que se publican con tu nombre y la inicial de tu apellido después de revisarlos.</li>
+      </ul>
+      <p><strong>Para qué los usamos:</strong> procesar, confirmar y entregar tus pedidos; contactarte sobre ellos; mostrarte tu historial de pedidos y publicar reseñas. No vendemos tus datos.</p>
+      <p><strong>Dónde se guardan:</strong> en nuestra base de datos alojada con Supabase. Si eliges enviar tu pedido por WhatsApp, el mensaje se procesa en esa plataforma. El carrito y la opción “Recordar mis datos” se guardan solo en tu dispositivo y puedes borrarlos desde tu navegador.</p>
+      <p><strong>Tus derechos (ARCO):</strong> puedes pedir acceso, rectificación, cancelación u oposición al uso de tus datos, o que borremos tu cuenta y tus reseñas, escribiendo a <a href="mailto:atencionclientes@grandpet.com">atencionclientes@grandpet.com</a>.</p>
+      <p>El aviso de privacidad completo de la empresa aparece más abajo.</p>
+    </section>
+
     <div id="policies"></div>
   </main>
   <div id="site-footer"></div>
@@ -29,7 +58,7 @@
     addEventListener("DOMContentLoaded", () => window.GP_READY.then(() => {
       const { esc } = window.GP;
       // p.html viene sanitizado por tools/build_data.py
-      document.querySelector("nav.chips").innerHTML = POLICIES.map((p) => `<a class="chip" href="#${p.key}">${esc(p.title)}</a>`).join("");
+      document.querySelector("nav.chips").innerHTML += POLICIES.map((p) => `<a class="chip" href="#${p.key}">${esc(p.title)}</a>`).join("");
       document.getElementById("policies").innerHTML = POLICIES.map((p) => `<section class="policy" id="${p.key}"><h2>${esc(p.title)}</h2>${p.html}</section>`).join("");
       if (location.hash) document.querySelector(location.hash)?.scrollIntoView();
     }));

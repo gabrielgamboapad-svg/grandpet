@@ -36,6 +36,7 @@ window.GP_READY.then(function () {
     <header class="pdp-head">
       <h1>${esc(p.title)}</h1>
       ${tagsHTML(p)}${meta ? `<p class="link-quiet" style="margin:8px 0 0">${esc(meta)}</p>` : ""}
+      ${p.reviewCount ? `<a class="stars-link" href="#resenas">${window.GP.starsHTML(p)}</a>` : ""}
     </header>
 
     <div class="pdp-gallery">
@@ -67,7 +68,7 @@ window.GP_READY.then(function () {
       ${ACC.length ? `<div class="accordion">${ACC.map(([k, t], i) => `<details${i === 0 ? " open" : ""}><summary>${t}</summary><div class="acc-body">${p.sections[k]}</div></details>`).join("")}</div>` : ""}
       ${BRANDS[p.brand] ? `<div class="brand-note"><h2>Sobre ${esc(p.brand)}®</h2><p>${esc(BRANDS[p.brand])}</p><a class="link-quiet" href="coleccion.html?c=todo&amp;brand=${encodeURIComponent(p.brand)}">Ver toda la línea ${esc(p.brand)} →</a></div>` : ""}
       <h2 id="resenas">Reseñas</h2>
-      <div class="accordion"><details><summary>Opiniones de clientes</summary><div class="acc-body"><p>Aún no hay reseñas de este producto.</p></div></details></div>
+      <div id="reviews" class="reviews" aria-live="polite"><p class="muted">Cargando reseñas…</p></div>
       <h2>Preguntas frecuentes</h2>
       <div class="accordion">
         <details><summary>¿Hacen envíos a todo México?</summary><div class="acc-body"><p>Hacemos envíos nacionales. El envío es gratis desde ${money(CFG.freeShipping)} MXN, sujeto a cobertura. Consulta la <a href="politicas.html#envios">política de envíos</a>.</p></div></details>
@@ -125,11 +126,70 @@ window.GP_READY.then(function () {
   ld.textContent = JSON.stringify({
     "@context": "https://schema.org", "@type": "Product", name: p.title, brand: { "@type": "Brand", name: p.brand },
     image: p.images.map((i) => i.src), description: desc,
+    ...(p.reviewCount ? { aggregateRating: { "@type": "AggregateRating", ratingValue: p.rating, reviewCount: p.reviewCount } } : {}),
     offers: p.variants.map((x) => ({ "@type": "Offer", name: x.title, price: x.price.toFixed(2), priceCurrency: "MXN", sku: String(x.id),
       availability: x.available ? "https://schema.org/InStock" : "https://schema.org/OutOfStock", url: `${location.origin}${location.pathname}?p=${encodeURIComponent(p.handle)}&v=${x.id}` })),
   });
   document.head.append(ld);
   render();
+  reviews();
+
+  // ---------- Reseñas: publicadas (aprobadas por el admin) y formulario con sesión de Google ----------
+  async function reviews() {
+    const box = document.getElementById("reviews");
+    const S = CFG.supabase;
+    let list = [];
+    try {
+      const q = `reviews?select=author,rating,body,verified,created_at&status=eq.publicada&handle=eq.${encodeURIComponent(p.handle)}&order=created_at.desc&limit=50`;
+      const r = await fetch(`${S.url}/rest/v1/${q}`, { headers: { apikey: S.key } });
+      if (r.ok) list = await r.json();
+    } catch {}
+    const star = (n) => `<span class="stars" role="img" aria-label="${n} de 5 estrellas">${"★".repeat(n)}${"☆".repeat(5 - n)}</span>`;
+    const back = location.pathname.split("/").pop() + location.search;
+    const cta = window.GP.account()
+      ? `<button class="btn btn-secondary" type="button" id="rv-open">Escribir una reseña</button>`
+      : `<a class="btn btn-secondary" href="cuenta.html?next=${encodeURIComponent(back + "#resenas")}">Inicia sesión con Google para opinar</a>`;
+    box.innerHTML = `${list.length ? `<p class="reviews-sum">${window.GP.starsHTML(p)}</p>` : `<p>Aún no hay reseñas de este producto. Cuéntanos qué le pareció a tu mascota.</p>`}
+      ${list.length ? `<ul class="review-list">${list.map((r) => `<li class="review">
+        <div class="review-top">${star(r.rating)} <strong>${esc(r.author)}</strong>${r.verified ? ` <span class="status status-entregado">Compra verificada</span>` : ""}</div>
+        <p>${esc(r.body)}</p><small class="muted">${new Date(r.created_at).toLocaleDateString("es-MX", { day: "numeric", month: "long", year: "numeric" })}</small></li>`).join("")}</ul>` : ""}
+      <div id="rv-area">${cta}</div>`;
+    const open = document.getElementById("rv-open");
+    if (open) open.onclick = form;
+  }
+
+  function form() {
+    const area = document.getElementById("rv-area");
+    area.innerHTML = `<form class="order-form admin-card" id="rv-form" novalidate>
+      <fieldset class="rating-input"><legend>Tu calificación *</legend>
+        ${[5, 4, 3, 2, 1].map((n) => `<input type="radio" name="rating" id="rv-${n}" value="${n}"${n === 5 ? " checked" : ""}><label for="rv-${n}" title="${n} de 5">★<span class="sr-only">${n} de 5 estrellas</span></label>`).join("")}
+      </fieldset>
+      <label for="rv-body">Tu opinión *</label>
+      <textarea id="rv-body" name="body" rows="3" minlength="10" maxlength="600" required placeholder="¿Le gustó a tu mascota? ¿Cómo le cayó?"></textarea>
+      <p class="small-print">Tu reseña se publica con tu nombre y la inicial de tu apellido después de que la revisemos. Si compraste este producto con tu cuenta, aparecerá como compra verificada.</p>
+      <p class="form-error" id="rv-err" role="alert" hidden></p>
+      <button class="btn btn-primary btn-small" type="submit">Enviar reseña</button></form>`;
+    document.getElementById("rv-body").focus();
+    document.getElementById("rv-form").onsubmit = async (e) => {
+      e.preventDefault();
+      const f = e.target, err = document.getElementById("rv-err"), btn = f.querySelector("button[type=submit]");
+      const body = f.body.value.trim();
+      if (body.length < 10) { err.textContent = "Escribe al menos 10 caracteres."; err.hidden = false; return; }
+      btn.disabled = true; btn.textContent = "Enviando…";
+      try {
+        const auth = await window.GP.loadAuth();
+        const user = await auth.user();
+        if (!user) { location.href = `cuenta.html?next=${encodeURIComponent(location.pathname.split("/").pop() + location.search + "#resenas")}`; return; }
+        const { error } = await auth.sb.from("reviews").insert({ handle: p.handle, rating: Number(f.rating.value), body });
+        if (error) throw error;
+        document.getElementById("rv-area").innerHTML = `<p class="flash ok" role="status">¡Gracias por tu reseña! La publicaremos en cuanto la revisemos.</p>`;
+      } catch (x) {
+        btn.disabled = false; btn.textContent = "Enviar reseña";
+        err.textContent = x && x.code === "23505" ? "Ya habías opinado sobre este producto. ¡Gracias!" : "No pudimos enviar tu reseña. Intenta de nuevo en un momento.";
+        err.hidden = false;
+      }
+    };
+  }
 
   // Productos relacionados: misma mascota y etapa; primero otros formatos (p. ej. croqueta → húmedo, premios).
   const related = PRODUCTS.filter((x) => x !== p && (x.pet === p.pet || x.pet === "ambos" || p.pet === "ambos")

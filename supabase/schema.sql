@@ -99,3 +99,58 @@ create table public.settings (
 alter table public.settings enable row level security;
 create policy settings_read on public.settings for select to anon, authenticated using (true);
 create policy settings_update on public.settings for update to authenticated using (public.is_admin()) with check (public.is_admin());
+
+-- Reseñas por producto: solo con sesión; el admin las aprueba antes de publicarse.
+create table public.reviews (
+  id bigint generated always as identity primary key,
+  handle text not null check (length(handle) between 1 and 200),
+  user_id uuid not null default auth.uid() references auth.users (id) on delete cascade,
+  author text not null default 'Cliente' check (length(author) between 1 and 60),
+  rating smallint not null check (rating between 1 and 5),
+  body text not null check (length(body) between 10 and 600),
+  verified boolean not null default false,
+  status text not null default 'pendiente' check (status in ('pendiente', 'publicada', 'rechazada')),
+  created_at timestamptz not null default now(),
+  unique (handle, user_id)
+);
+create index reviews_handle_idx on public.reviews (handle) where status = 'publicada';
+
+-- Al crear: autor (nombre + inicial), usuario, estado pendiente y "compra verificada" si tiene un pedido
+-- con ese producto. El cliente no puede falsear esos campos.
+create or replace function public.reviews_before_insert() returns trigger
+language plpgsql security definer set search_path = ''
+as $$
+declare
+  full_name text := coalesce(auth.jwt() -> 'user_metadata' ->> 'full_name', auth.jwt() -> 'user_metadata' ->> 'name', '');
+  parts text[] := regexp_split_to_array(trim(full_name), '\s+');
+begin
+  new.user_id := auth.uid();
+  new.status := 'pendiente';
+  new.created_at := now();
+  new.author := case
+    when full_name = '' then 'Cliente'
+    when array_length(parts, 1) > 1 then parts[1] || ' ' || left(parts[2], 1) || '.'
+    else parts[1] end;
+  new.verified := exists (
+    select 1 from public.orders o
+    where o.user_id = auth.uid()
+      and o.status <> 'cancelado'
+      and o.items @> jsonb_build_array(jsonb_build_object('handle', new.handle))
+  );
+  return new;
+end;
+$$;
+revoke all on function public.reviews_before_insert() from public, anon, authenticated;
+create trigger reviews_set_fields before insert on public.reviews
+  for each row execute function public.reviews_before_insert();
+
+alter table public.reviews enable row level security;
+create policy reviews_read_anon on public.reviews for select to anon using (status = 'publicada');
+create policy reviews_read_auth on public.reviews for select to authenticated
+  using (status = 'publicada' or user_id = (select auth.uid()) or public.is_admin());
+create policy reviews_insert_own on public.reviews for insert to authenticated
+  with check (user_id = (select auth.uid()));
+create policy reviews_update_admin on public.reviews for update to authenticated
+  using (public.is_admin()) with check (public.is_admin());
+create policy reviews_delete on public.reviews for delete to authenticated
+  using (user_id = (select auth.uid()) or public.is_admin());

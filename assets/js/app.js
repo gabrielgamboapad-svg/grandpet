@@ -14,8 +14,9 @@ async function loadRemote() {
   window.PRODUCTS_BASE = JSON.parse(JSON.stringify(window.PRODUCTS || []));
   window.PRODUCTS_ALL = window.PRODUCTS || [];
   try {
-    const [edits, promos, settings] = await Promise.race([
-      Promise.all([get("product_edits?select=handle,data"), get("promos?select=text,code,link,start_date,end_date"), get("settings?select=key,value")]),
+    const [edits, promos, settings, reviews] = await Promise.race([
+      Promise.all([get("product_edits?select=handle,data"), get("promos?select=text,code,link,start_date,end_date"), get("settings?select=key,value"),
+        get("reviews?select=handle,rating&status=eq.publicada")]),
       new Promise((_, no) => setTimeout(() => no(new Error("tiempo agotado")), 2500)),
     ]);
     const by = Object.fromEntries((window.PRODUCTS || []).map((p) => [p.handle, p]));
@@ -33,6 +34,10 @@ async function loadRemote() {
         if (typeof e.available === "boolean") v.available = e.available;
       });
     });
+    // Promedio de estrellas y número de reseñas publicadas por producto.
+    const agg = {};
+    reviews.forEach((r) => { const a = (agg[r.handle] ||= { n: 0, sum: 0 }); a.n++; a.sum += r.rating; });
+    Object.entries(agg).forEach(([h, a]) => { if (by[h]) { by[h].rating = Math.round((a.sum / a.n) * 10) / 10; by[h].reviewCount = a.n; } });
     window.PRODUCTS = (window.PRODUCTS || []).filter((p) => !p.hidden);
     const C = window.GP_CONFIG;
     C.promos = [...(C.promos || []), ...promos.map((x) => ({ text: x.text, code: x.code, link: x.link, start: x.start_date, end: x.end_date }))];
@@ -111,6 +116,24 @@ async function loadRemote() {
     return `<div class="tags">${t.join("")}</div>`;
   }
   const url = (p) => `producto.html?p=${encodeURIComponent(p.handle)}`;
+  // Estrellas solo con reseñas publicadas (aprobadas por el admin).
+  function starsHTML(p) {
+    if (!p.reviewCount) return "";
+    const full = Math.round(p.rating);
+    return `<span class="stars" role="img" aria-label="${p.rating} de 5 estrellas, ${p.reviewCount} ${p.reviewCount === 1 ? "reseña" : "reseñas"}">${"★".repeat(full)}${"☆".repeat(5 - full)} <small>${p.rating} (${p.reviewCount})</small></span>`;
+  }
+  // Carga supabase-js y auth.js solo cuando hacen falta (p. ej. escribir una reseña).
+  function loadAuth() {
+    if (window.GP_AUTH) return window.GP_AUTH;
+    const add = (src, attrs = {}) => new Promise((ok, no) => {
+      const s = Object.assign(document.createElement("script"), { src, onload: ok, onerror: () => no(new Error("No se pudo cargar " + src)) });
+      Object.entries(attrs).forEach(([k, v]) => s.setAttribute(k, v));
+      document.head.append(s);
+    });
+    return add("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js", {
+      integrity: "sha384-rwykjmWNwVxboyFmvK9OXN0wj9hnMHA2aAHtits54DuACyCq0M2PrSNxhRb+hvXT", crossorigin: "anonymous" })
+      .then(() => add("assets/js/auth.js")).then(() => window.GP_AUTH);
+  }
 
   function cardHTML(p, { eager = false } = {}) {
     const single = p.variants.length === 1;
@@ -121,8 +144,7 @@ async function loadRemote() {
       : single
         ? `<button class="btn btn-primary btn-small btn-block" type="button" data-add="${p.variants[0].id}" aria-label="Agregar ${esc(p.short)} al carrito">Agregar</button>`
         : `<a class="btn btn-secondary btn-small btn-block" href="${url(p)}" tabindex="-1" aria-hidden="true">Ver producto</a>`;
-    // ponytail: la tienda no expone reseñas; cuando existan, llenar p.rating en los datos y se pintan solas.
-    const stars = p.rating ? `<span class="stars" aria-label="${p.rating} de 5 estrellas">${"★".repeat(Math.round(p.rating))}</span>` : "";
+    const stars = starsHTML(p);
     return `<article class="card">
       <div class="card-media">${img(im && im.src, { alt: `Empaque de ${p.short}`, eager, w: (im && im.w) || 1, h: (im && im.h) || 1, sizes: "(min-width:1024px) 280px, (min-width:700px) 40vw, 75vw" })}</div>
       <div class="card-body">${tagsHTML(p)}<h3 class="card-title"><a href="${url(p)}">${esc(p.short)}</a></h3>${stars}${priceHTML(p)}${btn}</div>
@@ -293,6 +315,7 @@ async function loadRemote() {
             <li><a href="${tel}">Llámanos: ${esc(phoneText)}</a></li>
             <li><a href="mailto:${CFG.email}">${esc(CFG.email)}</a></li>
             ${waOk ? `<li><a href="${wa("Hola, tengo una pregunta sobre GrandPET")}">WhatsApp: ${esc(waText)}</a></li>` : ""}
+            <li><a href="politicas.html#compras-sitio">Cómo comprar</a></li>
             <li><a href="politicas.html#envios">Política de envíos</a></li>
             <li><a href="politicas.html#devoluciones">Cambios y devoluciones</a></li>
             <li><a href="politicas.html#privacidad">Aviso de privacidad</a></li>
@@ -474,7 +497,7 @@ async function loadRemote() {
     if (ogd) ogd.content = desc;
   }
 
-  window.GP = { CFG, PRODUCTS, BY_HANDLE, COLLECTIONS, collection, cart, cardHTML, priceHTML, tagsHTML, img, money, esc, norm, search, noResultsHTML, shipProgressHTML, setMeta, petLabel, tel, wa, waOk, phoneText, ICON, url, BRANDS, initCarousel, inRange, fmtDate };
+  window.GP = { CFG, PRODUCTS, BY_HANDLE, COLLECTIONS, collection, cart, cardHTML, priceHTML, tagsHTML, img, money, esc, norm, search, noResultsHTML, shipProgressHTML, setMeta, petLabel, tel, wa, waOk, phoneText, ICON, url, BRANDS, initCarousel, inRange, fmtDate, starsHTML, loadAuth, account };
 
   renderChrome();
   document.querySelectorAll("[data-search]").forEach(initSearch);

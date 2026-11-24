@@ -8,7 +8,10 @@ window.GP_AUTH.then(async (auth) => {
 
   // Quita ?code= de la barra después de volver de Google.
   const user = await auth.user();
-  if (location.search.includes("code=")) history.replaceState(null, "", location.pathname);
+  // Después de iniciar sesión, regresar a donde estaba (p. ej. la ficha para escribir una reseña).
+  const next = new URLSearchParams(location.search).get("next");
+  if (user && next && /^[\w.-]+\.html(\?[^#]*)?(#[\w-]*)?$/.test(next)) { location.replace(next); return; }
+  if (location.search.includes("code=")) history.replaceState(null, "", location.pathname + (next ? "?next=" + encodeURIComponent(next) : ""));
 
   if (!user) {
     box.innerHTML = `<section class="login-card">

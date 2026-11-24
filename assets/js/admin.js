@@ -24,7 +24,7 @@ window.GP_AUTH.then(async (auth) => {
     return;
   }
 
-  const TABS = [["pedidos", "Pedidos"], ["productos", "Productos"], ["promos", "Promociones"], ["admins", "Administradores"]];
+  const TABS = [["pedidos", "Pedidos"], ["productos", "Productos"], ["resenas", "Reseñas"], ["promos", "Promociones"], ["admins", "Administradores"]];
   box.innerHTML = `<header class="account-head"><div><h1>Administración</h1><p class="muted">${esc(user.email)}</p></div>
       <button class="btn btn-secondary btn-small" type="button" id="logout">Cerrar sesión</button></header>
     <div class="tabs" role="tablist" aria-label="Secciones del panel">${TABS.map(([k, t], i) => `<button role="tab" type="button" id="tab-${k}" aria-controls="panel-${k}" aria-selected="${i === 0}" tabindex="${i === 0 ? 0 : -1}">${t}</button>`).join("")}</div>
@@ -39,7 +39,7 @@ window.GP_AUTH.then(async (auth) => {
       $(`#tab-${t}`).tabIndex = on ? 0 : -1;
       $(`#panel-${t}`).hidden = !on;
     });
-    if (!loaded[k]) { loaded[k] = true; ({ pedidos, productos, promos, admins })[k](); }
+    if (!loaded[k]) { loaded[k] = true; ({ pedidos, productos, resenas, promos, admins })[k](); }
   };
   const tablist = $(".tabs");
   tablist.addEventListener("click", (e) => { const b = e.target.closest("[role=tab]"); if (b) show(b.id.slice(4)); });
@@ -185,6 +185,52 @@ window.GP_AUTH.then(async (auth) => {
         dlg.close(); await load(); flash($("#p-flash"), "Producto restablecido.");
       };
     }
+    load();
+  }
+
+  // ======================= Reseñas (moderación) =======================
+  async function resenas() {
+    const P = $("#panel-resenas");
+    const RS = [["pendiente", "Pendientes"], ["publicada", "Publicadas"], ["rechazada", "Rechazadas"]];
+    const name = (h) => (window.PRODUCTS_ALL.find((x) => x.handle === h) || { short: h }).short;
+    P.innerHTML = `<div class="admin-tools"><label>Mostrar <select id="r-status">${RS.map(([v, t]) => `<option value="${v}">${t}</option>`).join("")}<option value="">Todas</option></select></label></div>
+      <p class="small-print">Solo las publicadas se ven en la tienda y cuentan para las estrellas. "Compra verificada" la pone la base si el cliente tiene un pedido con ese producto.</p>
+      <p class="flash" id="r-flash" hidden></p><ul class="orders" id="r-list"><li class="muted">Cargando…</li></ul>`;
+    let rows = [];
+    const load = async () => {
+      const { data, error } = await sb.from("reviews").select("*").order("created_at", { ascending: false }).limit(300);
+      if (error) { $("#r-list").innerHTML = `<li class="form-error">${esc(error.message)}</li>`; return; }
+      rows = data; draw();
+    };
+    const draw = () => {
+      const st = $("#r-status").value, list = rows.filter((r) => !st || r.status === st);
+      $("#r-status").querySelectorAll("option").forEach((op) => { const n = op.value ? rows.filter((r) => r.status === op.value).length : rows.length; op.textContent = `${op.value ? RS.find((x) => x[0] === op.value)[1] : "Todas"} (${n})`; });
+      $("#r-list").innerHTML = list.map((r) => `<li class="order" data-id="${r.id}">
+        <div class="order-top"><strong>${"★".repeat(r.rating)}${"☆".repeat(5 - r.rating)}</strong> <span>${esc(r.author)}</span>
+          ${r.verified ? `<span class="status status-entregado">Compra verificada</span>` : ""}<span class="muted">${fecha(r.created_at)}</span></div>
+        <p><a href="producto.html?p=${encodeURIComponent(r.handle)}#resenas" target="_blank" rel="noopener">${esc(name(r.handle))}</a></p>
+        <p>${esc(r.body)}</p>
+        <div class="ed-actions" style="justify-content:flex-start">
+          ${r.status !== "publicada" ? `<button class="btn btn-primary btn-small" type="button" data-set="publicada">Publicar</button>` : ""}
+          ${r.status !== "rechazada" ? `<button class="btn btn-secondary btn-small" type="button" data-set="rechazada">Rechazar</button>` : ""}
+          <button class="btn btn-secondary btn-small" type="button" data-del-review>Eliminar</button></div></li>`).join("") || `<li class="empty">No hay reseñas aquí.</li>`;
+    };
+    $("#r-status").onchange = draw;
+    P.addEventListener("click", async (e) => {
+      const li = e.target.closest("[data-id]");
+      if (!li) return;
+      const id = Number(li.dataset.id);
+      if (e.target.matches("[data-set]")) {
+        const { error } = await sb.from("reviews").update({ status: e.target.dataset.set }).eq("id", id);
+        if (error) return flash($("#r-flash"), "No se pudo actualizar: " + error.message, false);
+        rows.find((r) => r.id === id).status = e.target.dataset.set; draw();
+        flash($("#r-flash"), e.target.dataset.set === "publicada" ? "Reseña publicada." : "Reseña rechazada.");
+      } else if (e.target.matches("[data-del-review]") && confirm("¿Eliminar esta reseña? No se puede deshacer.")) {
+        const { error } = await sb.from("reviews").delete().eq("id", id);
+        if (error) return flash($("#r-flash"), "No se pudo eliminar: " + error.message, false);
+        rows = rows.filter((r) => r.id !== id); draw(); flash($("#r-flash"), "Reseña eliminada.");
+      }
+    });
     load();
   }
 

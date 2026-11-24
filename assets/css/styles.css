@@ -619,6 +619,22 @@ p { margin: 0 0 1em; }
 .ed-table input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--verde); }
 .ed-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 
+/* ======================= Reseñas ======================= */
+.stars small { color: var(--cafe-suave); font-weight: 700; font-size: .8em; }
+.stars-link { display: inline-block; margin-top: 6px; text-decoration: none; }
+.reviews-sum { font-size: 1.1rem; }
+.review-list { list-style: none; padding: 0; margin: 0 0 14px; display: grid; gap: 10px; }
+.review { background: var(--blanco); border-radius: var(--radio); box-shadow: var(--sombra); padding: 12px 14px; }
+.review p { margin: 6px 0; }
+.review-top { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; }
+/* Selector de estrellas: en el HTML van de 5 a 1 y se muestran de 1 a 5. */
+.rating-input { border: 0; padding: 0; margin: 0 0 6px; display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; }
+.rating-input legend { font-weight: 700; font-size: .92rem; margin-bottom: 4px; width: 100%; }
+.rating-input input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.rating-input label { font-size: 2rem; line-height: 1; color: var(--borde); cursor: pointer; min-width: 40px; min-height: 40px; display: grid; place-items: center; }
+.rating-input input:checked ~ label, .rating-input label:hover, .rating-input label:hover ~ label { color: #C98A00; }
+.rating-input input:focus-visible + label { outline: 3px solid var(--verde); outline-offset: 2px; border-radius: 8px; }
+
 /* ======================= Celular: todo más compacto ======================= */
 @media (max-width: 699px) {
   :root { --gutter: 12px; --radio: 14px; --radio-lg: 16px; }
