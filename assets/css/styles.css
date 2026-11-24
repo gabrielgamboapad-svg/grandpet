@@ -622,7 +622,7 @@ p { margin: 0 0 1em; }
 
 /* Menú en una sola línea; en pantallas medianas el buscador baja a su propia fila */
 .main-nav a { white-space: nowrap; }
-@media (min-width: 1024px) and (max-width: 1279px) {
+@media (min-width: 1024px) and (max-width: 1399px) {
   .main-nav a { padding: 0 8px; font-size: .92rem; }
   .header-search { display: none; }
   .search-row { display: block; }
@@ -653,6 +653,62 @@ p { margin: 0 0 1em; }
 .rating-input label { font-size: 2rem; line-height: 1; color: var(--borde); cursor: pointer; min-width: 40px; min-height: 40px; display: grid; place-items: center; }
 .rating-input input:checked ~ label, .rating-input label:hover, .rating-input label:hover ~ label { color: #C98A00; }
 .rating-input input:focus-visible + label { outline: 3px solid var(--verde); outline-offset: 2px; border-radius: 8px; }
+
+/* ======================= Animaciones de entrada (≈3 s por sección) =======================
+   Solo con la clase .anim (la pone app.js si hay JS y no está activado "reducir movimiento").
+   Los keyframes terminan en transform: none para no afectar elementos sticky o fixed. */
+.anim .rv { opacity: 0; }
+.anim .rv.rv-in { animation: rv-up .9s cubic-bezier(.2, .75, .25, 1) both; }
+@keyframes rv-up { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+.anim .rv.rv-done { animation: none; opacity: 1; }
+
+/* Elementos dentro de la sección: entran escalonados con un pequeño rebote */
+.anim .rv-in :is(.card, .cat, .brand-card, .info-card, .logo-card, .line-card, .review, .order, .about-points li, .values li, .steps li, .guide fieldset, .trust li, .cart-item, .cards-3 > li, .cards-4 > li) {
+  animation: rv-pop .75s cubic-bezier(.3, 1.45, .5, 1) both;
+  animation-delay: calc(.3s + var(--i, 0) * .15s);
+}
+@keyframes rv-pop { from { opacity: 0; transform: translateY(20px) scale(.92); } to { opacity: 1; transform: none; } }
+
+/* Barra de color que se dibuja bajo cada título */
+.anim .rv-in :is(h1, h2):not(.sr-only)::after {
+  content: ""; display: block; width: 56px; height: 4px; margin-top: 8px; border-radius: 4px;
+  background: linear-gradient(90deg, var(--naranja), var(--amarillo));
+  transform-origin: left; animation: rv-bar .9s .4s cubic-bezier(.2, .8, .2, 1) both;
+}
+.carousel-head h2::after, .huella-band h2::after { margin-top: 6px; }
+@keyframes rv-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* Rastro de huellitas: cruza la parte superior de la sección y se desvanece a los 3 s */
+.paws { position: absolute; top: 4px; right: 14px; display: flex; gap: 10px; pointer-events: none; z-index: 3; }
+.paws svg { width: 22px; height: 22px; opacity: 0; animation: paw 1.6s ease-out both; }
+.paws svg:nth-child(odd) { transform: rotate(-16deg) translateY(4px); }
+.paws svg:nth-child(even) { transform: rotate(16deg) translateY(-4px); }
+.paws svg:nth-child(1) { fill: var(--naranja); animation-delay: 0s; }
+.paws svg:nth-child(2) { fill: var(--verde); animation-delay: .35s; }
+.paws svg:nth-child(3) { fill: #E0A800; animation-delay: .7s; }
+.paws svg:nth-child(4) { fill: var(--naranja); animation-delay: 1.05s; }
+.paws svg:nth-child(5) { fill: var(--verde); animation-delay: 1.4s; }
+@keyframes paw {
+  0% { opacity: 0; scale: .3; }
+  18% { opacity: 1; scale: 1.15; }
+  30% { scale: 1; }
+  75% { opacity: .95; }
+  100% { opacity: 0; scale: .9; }
+}
+
+/* Portada: figuras de color que flotan detrás del hero y la foto que se acerca */
+.hero-card { position: relative; }
+.hero-card > * { position: relative; z-index: 1; }
+.anim .hero.rv-in .hero-card::before, .anim .hero.rv-in .hero-card::after {
+  content: ""; position: absolute; border-radius: 50%; z-index: 0; pointer-events: none;
+  animation: blob 3s cubic-bezier(.2, .8, .2, 1) both;
+}
+.anim .hero.rv-in .hero-card::before { width: 180px; height: 180px; top: -70px; right: -60px; background: var(--amarillo); }
+.anim .hero.rv-in .hero-card::after { width: 200px; height: 200px; bottom: -120px; left: -70px; background: #CDE5D7; animation-delay: .3s; }
+@keyframes blob { 0% { transform: scale(0); opacity: 0; } 55% { transform: scale(1.12); opacity: .7; } 100% { transform: scale(1); opacity: .55; } }
+.anim .rv-in :is(.hero-photo, .page-hero-img, .huella-arte) { animation: zoom-in 1.8s .25s cubic-bezier(.2, .8, .2, 1) both; }
+@keyframes zoom-in { from { opacity: 0; transform: scale(.85) rotate(-2deg); } to { opacity: 1; transform: none; } }
+.anim .rv-in .hero-kicker { animation: rv-pop .7s .2s cubic-bezier(.3, 1.45, .5, 1) both; }
 
 /* ======================= Celular: todo más compacto ======================= */
 @media (max-width: 699px) {

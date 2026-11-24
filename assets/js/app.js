@@ -525,6 +525,53 @@ async function loadRemote() {
   document.querySelectorAll("[data-search]").forEach(initSearch);
   document.querySelectorAll("[data-carousel]").forEach((s) => initCarousel(s));
   addEventListener("storage", (e) => { if (e.key === KEY) { updateCount(); document.dispatchEvent(new CustomEvent("cart:change")); } });
+  // ---------- Animaciones de entrada (≈3 s por sección): sube y aparece, elementos escalonados,
+  // rastro de huellitas y barra bajo el título. Solo con JS y sin "reducir movimiento". ----------
+  if (!reduceMotion && "IntersectionObserver" in window) {
+    document.documentElement.classList.add("anim");
+    const SEL = ".hero, .page-hero, main > section, main .section, .coll-head, .coll-layout > section, .pdp-head, .pdp-gallery, .pdp-info, .pdp-extra, .brand-hero, .brand-intro, .line-group, .account-page, .cart-layout, .policy, .contact-layout, .login-card, body > section.section";
+    const ITEMS = ".card, .cat, .brand-card, .info-card, .logo-card, .line-card, .review, .order, .about-points li, .values li, .steps li, .guide fieldset, .trust li, .cart-item, .cards-3 > li, .cards-4 > li";
+    const PAW = '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="16" rx="5" ry="4.2"/><circle cx="6.2" cy="9.6" r="2.2"/><circle cx="10" cy="6.2" r="2.2"/><circle cx="14" cy="6.2" r="2.2"/><circle cx="17.8" cy="9.6" r="2.2"/></svg>';
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      if (!e.isIntersecting) return;
+      io.unobserve(e.target);
+      e.target.classList.add("rv-in");
+      e.target.querySelectorAll(ITEMS).forEach((it, i) => it.style.setProperty("--i", Math.min(i, 9)));
+      // Rastro de huellitas, solo en bloques grandes con título.
+      if (e.target.querySelector("h1, h2") && e.target.offsetHeight > 160 && !e.target.querySelector(":scope > .paws")) {
+        const paws = document.createElement("div");
+        paws.className = "paws";
+        paws.setAttribute("aria-hidden", "true");
+        paws.innerHTML = PAW.repeat(5);
+        if (getComputedStyle(e.target).position === "static") e.target.style.position = "relative"; // sin romper sticky
+        e.target.prepend(paws);
+        setTimeout(() => paws.remove(), 3200);
+      }
+    }), { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    // Al terminar, se quita la animación para que no quede ninguna transformación (sticky/fixed).
+    const done = (e) => { if (e.target === e.currentTarget && e.animationName === "rv-up") e.target.classList.add("rv-done"); };
+    const watch = (el) => { el.classList.add("rv"); el.addEventListener("animationend", done); io.observe(el); };
+    const tag = (root) => root.querySelectorAll && root.querySelectorAll(SEL).forEach((el) => { if (!el.classList.contains("rv")) watch(el); });
+    tag(document);
+    // Red de seguridad: lo que ya quedó arriba o dentro de la pantalla (scroll muy rápido o salto
+    // con un enlace #) se muestra aunque el observador no lo haya visto.
+    let ticking = false;
+    const sweep = () => {
+      ticking = false;
+      document.querySelectorAll(".rv:not(.rv-in)").forEach((el) => {
+        if (el.getBoundingClientRect().top < innerHeight) { el.classList.add("rv-in"); io.unobserve(el); }
+      });
+    };
+    addEventListener("scroll", () => { if (!ticking) { ticking = true; setTimeout(sweep, 250); } }, { passive: true });
+    setTimeout(sweep, 1500);
+    // Las páginas pintan secciones después (carruseles, ficha, reseñas): también se animan.
+    new MutationObserver((ms) => ms.forEach((m) => m.addedNodes.forEach((n) => {
+      if (n.nodeType !== 1) return;
+      if (n.matches(SEL) && !n.classList.contains("rv")) watch(n);
+      tag(n);
+    }))).observe(document.body, { childList: true, subtree: true });
+  }
+
   // Producto que se quiso agregar antes de iniciar sesión: se agrega al volver.
   try {
     const pend = JSON.parse(sessionStorage.getItem(PENDING) || "null");
