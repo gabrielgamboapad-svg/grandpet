@@ -532,9 +532,31 @@ async function loadRemote() {
     const SEL = ".hero, .page-hero, main > section, main .section, .coll-head, .coll-layout > section, .pdp-head, .pdp-gallery, .pdp-info, .pdp-extra, .brand-hero, .brand-intro, .line-group, .account-page, .cart-layout, .policy, .contact-layout, .login-card, body > section.section";
     const ITEMS = ".card, .cat, .brand-card, .info-card, .logo-card, .line-card, .review, .order, .about-points li, .values li, .steps li, .guide fieldset, .trust li, .cart-item, .cards-3 > li, .cards-4 > li";
     const PAW = '<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="16" rx="5" ry="4.2"/><circle cx="6.2" cy="9.6" r="2.2"/><circle cx="10" cy="6.2" r="2.2"/><circle cx="14" cy="6.2" r="2.2"/><circle cx="17.8" cy="9.6" r="2.2"/></svg>';
+    // Banner por sección: el título (y su subtítulo) pasan a una franja de color con la foto de un
+    // producto de la sección y figuras decorativas. Colores alternados; se arma al aparecer.
+    let theme = 0;
+    function bannerize(sec) {
+      if (sec.dataset.banner || sec.closest(".sec-banner")) return;
+      const h = sec.matches(".coll-head") ? sec.querySelector(":scope > h1")
+        : sec.querySelector(":scope > .wrap > h2, :scope > .wrap > .carousel-head > h2, :scope > h2, :scope > .wrap > header > h2");
+      if (!h || h.closest(".hero-card, .guide, .about, .cta-band, .huella-band")) return;
+      sec.dataset.banner = "1";
+      const im = sec.querySelector(".card-media img, .cat-media img, .brand-media img, .line-media img, .logo-media img, .round-img, .page-hero-img")
+        || (sec.matches(".coll-head") && document.querySelector("#grid .card-media img"));
+      const src = im && (im.currentSrc || im.getAttribute("src"));
+      const sub = h.nextElementSibling && h.nextElementSibling.matches("p.section-sub, .coll-head > p") ? h.nextElementSibling : null;
+      const b = document.createElement("div");
+      b.className = `sec-banner sb-t${theme++ % 4}`;
+      b.innerHTML = `<div class="sb-text"></div><div class="sb-art" aria-hidden="true"><span class="sb-dot d1"></span><span class="sb-dot d2"></span><span class="sb-dot d3"></span>${src ? `<img src="${esc(src)}" alt="" decoding="async">` : PAW}</div><span class="sb-shine" aria-hidden="true"></span>`;
+      h.before(b);
+      b.querySelector(".sb-text").append(h);
+      if (sub) b.querySelector(".sb-text").append(sub);
+    }
+
     const io = new IntersectionObserver((entries) => entries.forEach((e) => {
       if (!e.isIntersecting) return;
       io.unobserve(e.target);
+      bannerize(e.target);
       e.target.classList.add("rv-in");
       e.target.querySelectorAll(ITEMS).forEach((it, i) => it.style.setProperty("--i", Math.min(i, 9)));
       // Rastro de huellitas, solo en bloques grandes con título.
@@ -559,7 +581,7 @@ async function loadRemote() {
     const sweep = () => {
       ticking = false;
       document.querySelectorAll(".rv:not(.rv-in)").forEach((el) => {
-        if (el.getBoundingClientRect().top < innerHeight) { el.classList.add("rv-in"); io.unobserve(el); }
+        if (el.getBoundingClientRect().top < innerHeight) { bannerize(el); el.classList.add("rv-in"); io.unobserve(el); }
       });
     };
     addEventListener("scroll", () => { if (!ticking) { ticking = true; setTimeout(sweep, 250); } }, { passive: true });
