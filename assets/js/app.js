@@ -493,17 +493,35 @@ async function loadRemote() {
         pauseBtn.setAttribute("aria-label", `${v ? "Reanudar" : "Pausar"} desplazamiento automático de ${title}`);
       };
       pauseBtn.onclick = () => setStopped(!stopped);
-      sec.addEventListener("pointerenter", (e) => { if (e.pointerType === "mouse") hold = true; });
-      sec.addEventListener("pointerleave", (e) => { if (e.pointerType === "mouse") hold = false; });
-      sec.addEventListener("focusin", (e) => { if (e.target !== pauseBtn) hold = true; });
-      sec.addEventListener("focusout", () => (hold = false));
-      sec.addEventListener("touchstart", () => { hold = true; clearTimeout(touchTimer); }, { passive: true });
-      sec.addEventListener("touchend", () => { touchTimer = setTimeout(() => (hold = false), 5000); }, { passive: true });
+      // Solo se detiene mientras el cliente lo desliza (y reanuda 4 s después) o si navega con teclado.
+      // No se pausa por el mouse encima ni al tocar un producto (antes se quedaba atorado).
+      const release = () => { clearTimeout(touchTimer); touchTimer = setTimeout(() => (hold = false), 4000); };
+      track.addEventListener("touchstart", () => { hold = true; clearTimeout(touchTimer); }, { passive: true });
+      track.addEventListener("touchend", release, { passive: true });
+      track.addEventListener("pointerdown", (e) => { if (e.pointerType === "mouse") { hold = true; clearTimeout(touchTimer); } });
+      addEventListener("pointerup", (e) => { if (e.pointerType === "mouse" && hold) release(); });
+      sec.addEventListener("focusin", (e) => { if (e.target !== pauseBtn && e.target.matches(":focus-visible")) hold = true; });
+      sec.addEventListener("focusout", () => { if (!sec.contains(document.activeElement)) hold = false; });
       new IntersectionObserver(([e]) => (visible = e.isIntersecting)).observe(track);
+
+      // Deslizamiento suave y visible (≈0.9 s, con aceleración y frenado); el snap se apaga mientras se mueve.
+      const glide = (to, ms = 900) => {
+        const from = track.scrollLeft, d = to - from, t0 = performance.now();
+        if (Math.abs(d) < 1) return;
+        track.classList.add("gliding");
+        const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+        const tick = (now) => {
+          const t = Math.min(1, (now - t0) / ms);
+          track.scrollLeft = from + d * ease(t);
+          if (t < 1) requestAnimationFrame(tick); else track.classList.remove("gliding");
+        };
+        requestAnimationFrame(tick);
+      };
       setInterval(() => {
-        if (hold || stopped || !visible || document.hidden) return;
-        if (atEnd()) track.scrollTo({ left: 0 }); else track.scrollBy({ left: step() });
-      }, Math.max(2, secs) * 1000); // nunca más rápido que cada 2 s
+        if (hold || stopped || !visible || document.hidden || track.matches(".dragging, .gliding")) return;
+        if (atEnd()) glide(0, 1300);
+        else glide(Math.min(track.scrollLeft + step(), track.scrollWidth - track.clientWidth));
+      }, Math.max(2, secs) * 1000);
     }
   }
 

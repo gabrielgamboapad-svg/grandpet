@@ -223,6 +223,7 @@ p { margin: 0 0 1em; }
 .track > li { flex: 0 0 calc((100% - var(--gap) * (var(--per) - 1)) / var(--per)); scroll-snap-align: start; }
 .track.dragging { scroll-snap-type: none; scroll-behavior: auto; cursor: grabbing; user-select: none; }
 .track.dragging a, .track.dragging button { pointer-events: none; }
+.track.gliding { scroll-snap-type: none; scroll-behavior: auto; }
 
 /* ---------- Colección ---------- */
 .breadcrumbs { font-size: .9rem; color: var(--cafe-suave); padding: 16px 0 0; }
