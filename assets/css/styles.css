@@ -544,6 +544,123 @@ p { margin: 0 0 1em; }
   .huella-hero { padding: 40px 0; }
 }
 
+/* ======================= Celular: todo más compacto ======================= */
+@media (max-width: 699px) {
+  :root { --gutter: 12px; --radio: 14px; --radio-lg: 16px; }
+  body { font-size: .9375rem; line-height: 1.5; }
+  h1 { font-size: 1.6rem; }
+  h2 { font-size: 1.25rem; }
+  .section { padding: 20px 0; }
+  .section-sub, .guide-sub { font-size: .9rem; }
+
+  /* Header */
+  .header-row { min-height: 54px; }
+  .logo img { height: 38px; }
+  .icon-btn { min-width: 44px; min-height: 44px; }
+  .icon-btn svg { width: 22px; height: 22px; }
+  .search-row { padding-bottom: 8px; }
+  .search input { min-height: 42px; font-size: .95rem; padding-left: 40px; }
+  .search > svg { top: 10px; left: 12px; width: 20px; height: 20px; }
+  .main-nav a { min-height: 44px; }
+  html { scroll-padding-top: 120px; }
+
+  /* Botones */
+  .btn { min-height: 46px; padding: 10px 18px; font-size: .95rem; }
+  .btn-small { min-height: 38px; padding: 8px 12px; font-size: .85rem; }
+
+  /* Portada */
+  .hero { padding-top: 10px; }
+  .hero-card { padding: 16px 14px; gap: 10px; }
+  .hero-kicker { font-size: .75rem; padding: 3px 10px; margin-bottom: 6px; }
+  .hero h1 { font-size: 1.6rem; }
+  .hero-sub { font-size: .9rem; margin-bottom: 12px; }
+  .hero-ctas { gap: 8px; }
+  .hero-more { font-size: .85rem; margin-top: 8px; }
+  .trust { font-size: .85rem; padding: 8px 12px; gap: 4px 14px; margin-top: 10px; }
+  .trust svg { width: 18px; height: 18px; }
+
+  /* Carruseles: 2 tarjetas y se asoma la tercera */
+  .track { --per: 2.15; --gap: 10px; padding-bottom: 12px; }
+  .carousel-head { margin-bottom: 6px; }
+  .arrow { width: 40px; height: 40px; }
+
+  /* Tarjetas de producto */
+  .card-media { padding: 6px; aspect-ratio: 1 / 1; }
+  .card-body { padding: 8px 10px 10px; gap: 6px; }
+  .tag { font-size: .68rem; padding: 2px 7px; }
+  .card-title { font-size: .85rem; line-height: 1.25; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .price-now { font-size: 1.05rem; }
+  .price-now small { font-size: .7rem; }
+  .price-was { font-size: .78rem; }
+  .price-off { font-size: .7rem; }
+  .grid { gap: 10px; }
+
+  /* Selector guiado */
+  .guide { padding: 14px 12px; gap: 10px; }
+  .guide legend { font-size: .92rem; margin-bottom: 6px; }
+  .step-n { width: 24px; height: 24px; font-size: .8rem; }
+  .guide-chip span { min-height: 38px; padding: 0 12px; font-size: .88rem; }
+  .guide-opts { gap: 6px; }
+
+  /* Marcas, empresa y bloques de contenido */
+  .brand-card { grid-template-columns: 64px 1fr; padding: 12px; gap: 12px; }
+  .brand-card h3 { font-size: 1.05rem; }
+  .brand-card p { font-size: .85rem; }
+  .about { padding: 16px 14px; gap: 14px; }
+  .about-points li { padding: 10px 12px; }
+  .about-points strong { font-size: 1rem; }
+  .about-points span { font-size: .88rem; }
+  .info-card { padding: 14px; }
+  .info-card h2, .info-card h3 { font-size: 1.05rem; }
+  .info-card p { font-size: .9rem; }
+  .values li { font-size: .85rem; padding: 6px 12px; }
+  .cta-band { padding: 16px; }
+  .cta-band h2 { font-size: 1.15rem; }
+  .huella-band { padding: 14px; }
+  .huella-band img { max-width: 200px; }
+  .huella-band p { font-size: .88rem; }
+  .huella-titulo, .huella-arte { max-width: 300px; }
+  .logo-grid { gap: 10px; }
+  .logo-card { padding: 10px; }
+  .logo-media { width: 72px; height: 72px; }
+  .logo-card h2 { font-size: .95rem; }
+  .logo-card p { font-size: .8rem; }
+  .brand-hero { padding: 14px; gap: 10px; grid-template-columns: 84px 1fr; }
+  .brand-hero-logo { width: 84px; height: 84px; }
+  .brand-hero h1 { font-size: 1.4rem; }
+  .brand-hero .hero-sub { font-size: .88rem; }
+  .brand-intro { font-size: .92rem; }
+  .line-card { grid-template-columns: 72px 1fr; padding: 12px; gap: 10px; }
+  .line-body h3 { font-size: 1.02rem; }
+  .line-body p, .line-body .benefits { font-size: .85rem; }
+  .huella-hero { padding: 16px 0; }
+  .steps li { padding: 12px; }
+  .cert-box img { width: 84px; }
+
+  /* Colección, ficha y carrito */
+  .coll-head p { font-size: .9rem; }
+  .coll-tools select { min-height: 42px; font-size: .88rem; }
+  .pdp-head h1 { font-size: 1.3rem; }
+  .gallery-main { padding: 8px; }
+  .thumbs button { width: 64px; font-size: .65rem; }
+  .thumbs img { width: 52px; height: 52px; }
+  .variant-options span { min-height: 42px; padding: 0 14px; font-size: .9rem; }
+  .buy-box { padding: 14px; gap: 10px; }
+  .buy-box .price-now { font-size: 1.6rem; }
+  .benefits li { font-size: .9rem; }
+  .accordion summary { min-height: 48px; padding: 10px 14px; font-size: 1rem; }
+  .accordion .acc-body { padding: 0 14px 14px; font-size: .9rem; }
+  .cart-item { grid-template-columns: 60px 1fr; padding: 10px; }
+  .cart-item img { width: 60px; height: 60px; }
+  .summary, .contact-form { padding: 14px; }
+  .order-form input:not([type="checkbox"]), .order-form textarea, .contact-form select { min-height: 44px; padding: 8px 12px; }
+
+  /* Footer y botón de WhatsApp */
+  .site-footer { padding-top: 24px; font-size: .9rem; }
+  .footer-grid { gap: 16px; }
+  .wa-float { width: 50px; height: 50px; right: 12px; bottom: 12px; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
