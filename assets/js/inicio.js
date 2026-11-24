@@ -10,7 +10,7 @@
   const form = document.getElementById("guide");
   const steps = form.querySelector(".guide-steps");
   const go = document.getElementById("guide-go");
-  const state = { pet: "perro", stage: "", format: "" };
+  const state = { pet: "perro", stage: "", format: "Seco" }; // arranca en croqueta: lo más buscado, menos resultados
 
   const match = (p, s = state) => (p.pet === s.pet || p.pet === "ambos")
     && (!s.stage || p.stage === s.stage) && (!s.format || p.format === s.format);
@@ -31,7 +31,13 @@
     if (state.format) u.set("format", state.format);
     u.set("guia", "1");
     go.href = "coleccion.html?" + u;
-    go.textContent = `Ver ${n} ${n === 1 ? "recomendación" : "recomendaciones"}`;
+    go.textContent = `Ver ${n} ${label(n)}`;
+  }
+  // "12 croquetas para perro adulto", "2 productos para gatito", etc.
+  function label(n) {
+    const what = { Seco: ["croqueta", "croquetas"], "Húmedo": ["alimento húmedo", "alimentos húmedos"], Premio: ["premio", "premios"] }[state.format] || ["producto", "productos"];
+    const who = state.stage === "Gatito" ? "gatito" : `${state.pet}${state.stage ? " " + state.stage.toLowerCase() : ""}`;
+    return `${what[n === 1 ? 0 : 1]} para ${who}`;
   }
   form.addEventListener("change", (e) => {
     state[e.target.name] = e.target.value;
@@ -54,6 +60,16 @@
       <div class="brand-media${m.logo ? " is-logo" : ""}">${media}</div>
       <div><h3><a href="marca.html?m=${m.slug}">${esc(m.name)}®</a></h3><p>${esc(BRANDS[m.store] || m.tagline)}</p>
       <a class="link-quiet" href="marca.html?m=${m.slug}">Conoce ${esc(m.name)} →</a></div></li>`;
+  }).join("");
+
+  // ---------- Compra por categoría: foto del más vendido y cuántos productos hay ----------
+  const CATS = [["perro", "Para perro"], ["gato", "Para gato"], ["premios", "Premios"], ["humedo", "Alimento húmedo"], ["paquetes", "Paquetes de ahorro"], ["accesorios", "Accesorios"]];
+  document.getElementById("cats").innerHTML = CATS.map(([k, t]) => {
+    const list = window.GP.collection(k);
+    const top = list.filter((p) => p.images[0]).sort((a, b) => a.rank - b.rank)[0];
+    return `<li><a class="cat" href="coleccion.html?c=${k}">
+      <span class="cat-media">${top ? img(top.images[0].src, { widths: [160, 240], sizes: "(min-width:1024px) 120px, 25vw", w: top.images[0].w, h: top.images[0].h }) : ""}</span>
+      <span class="cat-text"><strong>${t}</strong><small>Ver los ${list.length} →</small></span></a></li>`;
   }).join("");
 
   // ---------- La Huella Dorada: solo mientras esté vigente ----------

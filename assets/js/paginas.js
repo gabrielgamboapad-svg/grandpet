@@ -62,7 +62,7 @@
       if (list.length) {
         const sec = document.createElement("section");
         Object.assign(sec, { className: "section", id: "marca-tienda" });
-        Object.assign(sec.dataset, { title: `${m.name}® en la tienda`, limit: "12", autoplay: "4" });
+        Object.assign(sec.dataset, { title: `${m.name}® en la tienda`, limit: "12", autoplay: "6" });
         $("main").after(sec);
         initCarousel(sec, list);
       }

@@ -17,7 +17,9 @@
   setMeta(`${p.short} | GrandPET®`, desc);
 
   const multi = p.variants.length > 1;
-  let v = p.variants.find((x) => String(x.id) === params.get("v")) || p.variants.find((x) => x.available) || p.variants[0];
+  // Presentaciones de menor a mayor precio; por defecto la más barata disponible, la misma del "Desde" de la tarjeta.
+  const byPrice = [...p.variants].sort((a, b) => a.price - b.price);
+  let v = p.variants.find((x) => String(x.id) === params.get("v")) || byPrice.find((x) => x.available) || byPrice[0];
   // Las miniaturas usan el alt de la imagen como etiqueta (p. ej. "Beneficios", "Ingredientes"); si no hay, uno genérico.
   const label = (im, i) => im.alt || (i === 0 ? "Empaque" : `Vista ${i + 1}`);
   const altFor = (im, i) => im.alt || (i === 0 ? `Empaque de ${p.title}` : `${p.title}, vista ${i + 1}`);
@@ -42,8 +44,8 @@
     </div>
 
     <div class="pdp-info">
-      ${multi ? `<fieldset class="variant-picker"><legend>${esc(p.optionName || "Presentación")}</legend><div class="variant-options">
-        ${p.variants.map((x) => `<label${x.available ? "" : ' class="agotado"'}><input type="radio" name="variant" value="${x.id}"${x.id === v.id ? " checked" : ""}><span>${esc(x.title)}${x.available ? "" : " · agotado"}</span></label>`).join("")}
+      ${multi ? `<fieldset class="variant-picker"><legend>${/cantidad|paquete/i.test(p.optionName) ? "Cantidad" : "Presentación"}</legend><div class="variant-options">
+        ${byPrice.map((x) => `<label${x.available ? "" : ' class="agotado"'}><input type="radio" name="variant" value="${x.id}"${x.id === v.id ? " checked" : ""}><span>${esc(x.title)}${x.available ? "" : " · agotado"}</span></label>`).join("")}
       </div></fieldset>` : ""}
       ${p.benefits.length ? `<ul class="benefits" aria-label="Beneficios">${p.benefits.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}
       <div class="buy-box">
@@ -54,9 +56,9 @@
           <button class="btn btn-primary" type="button" id="add">Agregar al carrito</button>
         </div>
         <ul class="ship-signals">
-          <li>${ICON.truck}Envíos nacionales</li>
-          <li>${ICON.gift}Envío gratis desde ${money(CFG.freeShipping)} MXN, sujeto a cobertura</li>
-          <li>${ICON.shield}Sin registro: confirmas tu pedido por WhatsApp</li>
+          <li>${ICON.gift}<span id="ship-note"></span></li>
+          <li>${ICON.truck}<span>Entrega estimada de 1 a 5 días hábiles en toda la República; en zonas extendidas puede tardar más. <a href="politicas.html#envios">Envíos</a></span></li>
+          <li>${ICON.shield}<span>Cambios y devoluciones según nuestra <a href="politicas.html#devoluciones">política</a>. Sin registro: confirmas tu pedido por WhatsApp.</span></li>
         </ul>
       </div>
     </div>
@@ -96,14 +98,24 @@
     add.textContent = v.available ? "Agregar al carrito" : "Agotado";
     add.dataset.add = v.id;
     add.dataset.qty = qty.value;
+    shipNote();
   }
+  // Costo de envío según lo que ya hay en el carrito más esta presentación y cantidad.
+  function shipNote() {
+    const total = GP.cart.total() + v.price * Number(qty.value || 1);
+    const left = CFG.freeShipping - total;
+    document.getElementById("ship-note").innerHTML = left <= 0
+      ? `<strong>Envío gratis</strong> con este producto en tu pedido (sujeto a cobertura).`
+      : `Envío gratis desde ${money(CFG.freeShipping)} MXN: te faltarían <strong>${money(left)}</strong>. Si no, el costo se calcula según tu código postal.`;
+  }
+  document.addEventListener("cart:change", shipNote);
   root.addEventListener("change", (e) => {
     if (e.target.name !== "variant") return;
     v = p.variants.find((x) => String(x.id) === e.target.value);
     const u = new URLSearchParams(location.search); u.set("v", v.id); history.replaceState(null, "", "?" + u);
     render();
   });
-  const clamp = () => { qty.value = Math.min(99, Math.max(1, parseInt(qty.value, 10) || 1)); add.dataset.qty = qty.value; };
+  const clamp = () => { qty.value = Math.min(99, Math.max(1, parseInt(qty.value, 10) || 1)); add.dataset.qty = qty.value; shipNote(); };
   qty.addEventListener("change", clamp);
   root.querySelectorAll("[data-q]").forEach((b) => b.addEventListener("click", () => { qty.value = Number(qty.value) + Number(b.dataset.q); clamp(); }));
 
@@ -128,7 +140,7 @@
   sec.id = "relacionados";
   sec.dataset.title = "También te puede interesar";
   sec.dataset.limit = "10";
-  sec.dataset.autoplay = "4";
+  sec.dataset.autoplay = "6";
   document.getElementById("main").after(sec);
   initCarousel(sec, related);
 })();

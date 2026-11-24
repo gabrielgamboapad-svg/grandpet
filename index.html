@@ -34,10 +34,8 @@
             <p class="hero-more"><a class="link-quiet" href="nosotros.html">Conoce GrandPET</a> · <span class="cert">Certificación FSSC 22000</span></p>
           </div>
           <div class="hero-art" aria-hidden="true">
-            <img src="https://cdn.shopify.com/s/files/1/0095/4223/8266/files/Carne_Fresca_Force_20_Kg_1_Kg_Gratis.jpg?v=1794587382&amp;width=600"
-                 srcset="https://cdn.shopify.com/s/files/1/0095/4223/8266/files/Carne_Fresca_Force_20_Kg_1_Kg_Gratis.jpg?v=1794587382&amp;width=400 400w,
-                         https://cdn.shopify.com/s/files/1/0095/4223/8266/files/Carne_Fresca_Force_20_Kg_1_Kg_Gratis.jpg?v=1794587382&amp;width=600 600w"
-                 sizes="40vw" alt="" width="567" height="756" loading="lazy" decoding="async">
+            <!-- Foto de marca, sin promociones: un empaque con "1 kg gratis" anunciaría una promo sin vigencia ni condiciones -->
+            <img class="hero-photo" src="assets/img/empresa-1.webp" alt="" width="664" height="476" loading="lazy" decoding="async">
           </div>
         </div>
         <ul class="trust" aria-label="Envíos">
@@ -62,8 +60,15 @@
     <!-- Carruseles reutilizables, se desplazan solos. Configura cada uno con atributos:
          data-title, data-collection (perro, gato, premios, humedo, accesorios, ofertas, cachorros, gatitos,
          paquetes, mas-vendidos, todo), data-limit (cantidad) y data-autoplay (segundos entre avances). -->
-    <section class="section" data-carousel data-collection="mas-vendidos" data-title="Más vendidos" data-limit="10" data-autoplay="4" data-eager></section>
-    <section class="section" data-carousel data-collection="perro" data-title="Para perro" data-limit="10" data-autoplay="5"></section>
+    <section class="section" data-carousel data-collection="mas-vendidos" data-title="Más vendidos" data-limit="10" data-autoplay="6" data-eager></section>
+
+    <!-- En lugar de más filas de productos: accesos directos por categoría (inicio.js pone foto y conteo) -->
+    <section class="section" aria-labelledby="cats-t">
+      <div class="wrap">
+        <h2 id="cats-t">Compra por categoría</h2>
+        <ul class="cats" id="cats"></ul>
+      </div>
+    </section>
     <!-- La Huella Dorada: inicio.js lo quita fuera de vigencia (GP_CONFIG.huella) -->
     <section class="section" id="huella-banner" aria-labelledby="huella-t">
       <div class="wrap">
@@ -78,8 +83,6 @@
       </div>
     </section>
 
-    <section class="section" data-carousel data-collection="gato" data-title="Para gato" data-limit="10" data-autoplay="4"></section>
-
     <section class="section" aria-labelledby="marcas-t">
       <div class="wrap">
         <h2 id="marcas-t">Nuestras marcas</h2>
@@ -89,8 +92,6 @@
       </div>
     </section>
 
-    <section class="section" data-carousel data-collection="humedo" data-title="Alimento húmedo" data-limit="10" data-autoplay="5"></section>
-    <section class="section" data-carousel data-collection="paquetes" data-title="Paquetes de ahorro" data-limit="10" data-autoplay="4"></section>
 
     <section class="section" id="quienes-somos" aria-labelledby="qs-t">
       <div class="wrap">

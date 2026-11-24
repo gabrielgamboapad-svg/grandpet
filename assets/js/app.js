@@ -42,18 +42,22 @@
   }
 
   // ---------- precios: "Hoy/antes" solo con descuento real; "Desde" si depende del tamaño ----------
+  // Siempre el mismo formato: "Hoy $X · Antes $Y · Ahorras Z%". "Antes" solo si la tienda trae un precio
+  // anterior mayor al actual (compare_at_price). Sin variante elegida y con varios precios, se muestra la
+  // presentación más barata y se dice cuál es ("Desde $X · Presentación: 2 Kg").
   function priceHTML(p, v) {
+    let from = false;
     if (!v) {
       const prices = p.variants.map((x) => x.price);
-      const min = Math.min(...prices);
-      if (min !== Math.max(...prices)) return `<div class="price"><span class="price-now"><small>Desde</small>${money(min)}</span></div>`;
-      v = p.variants[0];
+      from = Math.min(...prices) !== Math.max(...prices);
+      v = from ? p.variants.reduce((a, b) => (b.price < a.price ? b : a)) : p.variants[0];
     }
-    if (v.compare && v.compare > v.price) {
-      const off = Math.round((1 - v.price / v.compare) * 100);
-      return `<div class="price"><span class="price-now"><small>Hoy</small>${money(v.price)}</span><span class="price-was"><span class="sr-only">Precio anterior: </span>antes ${money(v.compare)}</span><span class="price-off">Ahorras ${off}%</span></div>`;
-    }
-    return `<div class="price"><span class="price-now">${money(v.price)}</span></div>`;
+    const disc = v.compare && v.compare > v.price;
+    const off = disc ? Math.round((1 - v.price / v.compare) * 100) : 0;
+    const kind = /cantidad|paquete/i.test(p.optionName) ? "Cantidad" : "Presentación"; // la tienda usa Peso, Opciones, Size…
+    const size = from && v.title !== "Default Title" ? `<span class="price-size">${kind}: ${esc(v.title)}</span>` : "";
+    return `<div class="price"><span class="price-now"><small>${from ? "Desde" : disc ? "Hoy" : ""}</small>${money(v.price)}</span>${disc
+      ? `<span class="price-was"><span class="sr-only">Precio anterior: </span>Antes ${money(v.compare)}</span><span class="price-off">Ahorras ${off}%</span>` : ""}${size}</div>`;
   }
   const petLabel = { perro: "Perro", gato: "Gato", ambos: "Perro y gato", otros: "Pequeñas especies" };
   function tagsHTML(p) {
@@ -399,7 +403,7 @@
       setInterval(() => {
         if (hold || stopped || !visible || document.hidden) return;
         if (atEnd()) track.scrollTo({ left: 0 }); else track.scrollBy({ left: step() });
-      }, Math.max(3, secs) * 1000);
+      }, Math.max(5, secs) * 1000); // nunca más rápido que cada 5 s
     }
   }
 
